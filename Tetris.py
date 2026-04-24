@@ -1,11 +1,13 @@
 import pygame
 pygame.init()
+pygame.font.init()
 import numpy as np
 import random
 
 BlockSize = 25
 BgColor = [0, 0, 0]
 Shapes = [np.array([1, 1, 1, 1]), np.array([[1, 0], [1, 1], [1, 0]]), np.array([[0, 1], [1, 1], [0, 1]]), np.array([[1, 1], [1, 1]]), np.array([[0, 1], [1, 1], [1, 0]]), np.array([[1, 0], [1, 1], [0, 1]]), np.array([[1,1], [1, 0], [1, 0]]), np.array([[1,1], [0, 1], [0, 1]])]
+Font = pygame.font.SysFont("Comic Sans MS", 25)
 
 clock = pygame.time.Clock()
 FPS = 60
@@ -42,9 +44,9 @@ blocks_image = {
 
 class MovableBlocks:
 
-    def __init__(self):
+    def __init__(self, color=random.choices(list(blocks.keys()))[0]):
         self.speed = 1
-        self.color = random.choices(list(blocks.keys()))[0]
+        self.color = color
         self.state = 0
         self.array = blocks[self.color][self.state]
         self.put = False
@@ -52,7 +54,7 @@ class MovableBlocks:
         # we get the coordinates of each block of the movable_blocks
         self.co = self.get_co(a, True)
         # stores the actual positon of the array, so when it turns, it doesn't move right
-        self.pos = [0, screen_size[0] // 2 // BlockSize]
+        self.pos = [0, playing_screen_size[0] // 2 // BlockSize]
 
     def get_co(self, array, reverse):
         arr_co = np.nonzero(array == 1)
@@ -111,20 +113,52 @@ def move_line_down(y):
         else:
             a[y - i, :] = 0
 
+def update_next_block():
+    next_array = blocks[next_color][0]
 
+    for y in range(next_array.shape[0]):
+        for x in range(next_array.shape[1]):
+            if next_array[y, x] == 1:
+                screen.blit(blocks_image[next_color], (playing_screen_size[0] + offset + x * BlockSize, 70 + y * BlockSize, BlockSize, BlockSize))
+
+def update_score():
+    score_text = Font.render(f"Score : {score}", 1, (255, 255, 255))
+    screen.blit(score_text, (playing_screen_size[0] + offset, 200))
+
+def update_texts():
+    blocks_text = Font.render("Next block:", 1, (255, 255, 255))
+    screen.blit(blocks_text, (playing_screen_size[0] + offset, 20))
+
+def update_displays():
+    pygame.draw.rect(screen, [0, 0, 0], ((playing_screen_size[0] + offset, 0), (screen_size[0] - playing_screen_size[0], screen_size[1])))
+    update_score()
+    update_texts()
+    update_next_block()
 
 running = True
 
 pygame.display.set_caption("Tetris")
-screen_size = (250, 600)
+playing_screen_size = (300, 600)
+screen_size = (500, 600)
 screen = pygame.display.set_mode(screen_size)
 
 #creating the numpy array
-arr_size = (screen_size[1] // BlockSize, screen_size[0] // BlockSize)
+arr_size = (playing_screen_size[1] // BlockSize, playing_screen_size[0] // BlockSize)
 a = np.zeros(arr_size)
 
 movable_blocks = MovableBlocks()
 insert_blocks()
+
+next_color = random.choices(list(blocks.keys()))[0]
+line_broken = 0
+score = 0
+# var stores the normal speed, when k up isn't pressed
+normal_speed = 1
+
+offset = 20
+# creating the right part of the screen
+pygame.draw.rect(screen, [0, 0, 255], ((playing_screen_size[0], 0), (10, screen_size[1])))
+
 
 # c is a counter of the number of iterations of the main loop
 c = 0
@@ -143,17 +177,22 @@ while running:
     # checks if a line of a is only made of 2s, if so we move all the lines higher than this line down
     for i in range(a.shape[0]):
         if not 0 in a[i, :] and not 1 in a[i, :]:
+            line_broken += 1
             move_line_down(i)
+            if line_broken % 10 == 0:
+                normal_speed += 0.5
 
     if c % int(15/movable_blocks.speed) == 0:
 
         # getting the co of the blocks before moving them
         movable_blocks.co = movable_blocks.get_co(a, True)
 
+        print(a)
+
         # checks if the blocks can move down
         for i in range(len(movable_blocks.co)):
             # checks if the block below is not a put block or the end of the screen
-            if movable_blocks.co[i][0] + 1 >= screen_size[1] // BlockSize or a[movable_blocks.co[i][0] + 1, movable_blocks.co[i][1]] == 2:
+            if movable_blocks.co[i][0] + 1 >= playing_screen_size[1] // BlockSize or a[movable_blocks.co[i][0] + 1, movable_blocks.co[i][1]] == 2:
                 movable_blocks.put = True
                 break
 
@@ -162,11 +201,16 @@ while running:
             movable_blocks.move_down()
         else:
             # else, we create new blocks
-            a[a==1] = 2
-            movable_blocks = MovableBlocks()
+            for co in movable_blocks.co:
+                a[co[0], co[1]] = 2
+            movable_blocks = MovableBlocks(next_color)
             insert_blocks()
+            next_color = random.choices(list(blocks.keys()))[0]
+            score += 4
+
 
     pygame.display.flip()
+    update_displays()
 
     for event in pygame.event.get():
 
@@ -190,7 +234,7 @@ while running:
                     # calculates the co  of the new blocks on the main array a
                     new_co[i] = (new_co[i][0] + movable_blocks.pos[0], new_co[i][1] + movable_blocks.pos[1])
                     # checks if the blocks can turn without hitting put blocks or going out of the screen
-                    if 0 > new_co[i][0] or new_co[i][0] >= screen_size[1] // BlockSize or 0 > new_co[i][1] or new_co[i][1] >= screen_size[0] // BlockSize or a[new_co[i]] == 2:
+                    if 0 > new_co[i][0] or new_co[i][0] >= playing_screen_size[1] // BlockSize or 0 > new_co[i][1] or new_co[i][1] >= playing_screen_size[0] // BlockSize or a[new_co[i]] == 2:
                         movable_blocks.movable = False
 
                 if movable_blocks.movable:
@@ -208,7 +252,7 @@ while running:
 
                 for i in range(len(movable_blocks.co)):
                     # checks if the block on the right is not a put block or the end of the screen
-                    if movable_blocks.co[i][1] + 1 >= screen_size[0] // BlockSize or a[movable_blocks.co[i][0], movable_blocks.co[i][1]+1] == 2:
+                    if movable_blocks.co[i][1] + 1 >= playing_screen_size[0] // BlockSize or a[movable_blocks.co[i][0], movable_blocks.co[i][1] + 1] == 2:
                         print("yes")
                         movable_blocks.movable = False
                         break
@@ -237,10 +281,10 @@ while running:
                 movable_blocks.movable = True
 
             elif event.key == pygame.K_DOWN:
-                movable_blocks.speed = 3
+                movable_blocks.speed = 3*normal_speed
 
         else:
-            movable_blocks.speed = 1
+            movable_blocks.speed = normal_speed
 
     c += 1
     clock.tick(FPS)
