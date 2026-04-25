@@ -18,37 +18,37 @@ Careful:
  The numpy array that stores the position of the blocks is called a, there can be 3 different values:
     0 is when there's no block
     1 is for the blocks that you can move
-    2 is for the blocks that you can't move anymore
+    2-8 is for the blocks that you can't move anymore, the number depends on the color
 """""
 
 # dic stores all the arrays for each type of block, with the rotated ones too
 blocks = {
-    "blue": [np.array([[0, 1, 0], [1, 1, 0], [0, 1, 0]]), np.array([[0, 0, 0], [1, 1, 1], [0, 1, 0]]), np.array([[0, 1, 0], [0, 1, 1], [0, 1, 0]]), np.array([[0, 1, 0], [1, 1, 1], [0, 0, 0]])],
-    "cyan": [np.array([[1, 0, 0], [1, 1, 0], [0, 1, 0]]), np.array([[0, 0, 0], [0, 1, 1], [1, 1, 0]]), np.array([[0, 1, 0], [0, 1, 1], [0, 0, 1]]), np.array([[0, 1, 1], [1, 1, 0]])],
-    "green": [np.array([[0, 1, 0], [0, 1, 0], [1, 1, 0]]), np.array([[0, 0, 0], [1, 1, 1], [0, 0, 1]]), np.array([[0, 1, 1], [0, 1, 0], [0, 1, 0]]), np.array([[1, 0, 0], [1, 1, 1]])],
-    "pink": [np.array([[1, 1, 0], [0, 1, 0], [0, 1, 0]]), np.array([[0, 0, 0], [1, 1, 1], [1, 0 , 0]]), np.array([[0, 1, 0], [0, 1, 0], [0, 1, 1]]), np.array([[0, 0, 1], [1, 1, 1]])],
-    "purple": [np.array([[0, 1], [0, 1], [0, 1], [0, 1]]), np.array([[0, 0, 0, 0], [0, 0, 0, 0], [1, 1, 1, 1]]), np.array([[0, 0, 1], [0, 0, 1], [0, 0, 1], [0, 0, 1]]), np.array([[0, 0, 0, 0], [1, 1, 1, 1]])],
-    "red": [np.array([[1, 1], [1, 1]]), np.array([[1, 1], [1, 1]]), np.array([[1, 1], [1, 1]]), np.array([[1, 1], [1, 1]])],
-    "yellow": [np.array([[0, 1, 0], [1, 1, 0], [1, 0, 0]]), np.array([[0, 0, 0], [1, 1, 0], [0, 1, 1]]), np.array([[0, 0, 1], [0, 1, 1], [0, 1, 0]]), np.array([[1, 1, 0], [0, 1, 1]])]
+    2: [np.array([[0, 1, 0], [1, 1, 0], [0, 1, 0]]), np.array([[0, 0, 0], [1, 1, 1], [0, 1, 0]]), np.array([[0, 1, 0], [0, 1, 1], [0, 1, 0]]), np.array([[0, 1, 0], [1, 1, 1], [0, 0, 0]])],
+    3: [np.array([[1, 0, 0], [1, 1, 0], [0, 1, 0]]), np.array([[0, 0, 0], [0, 1, 1], [1, 1, 0]]), np.array([[0, 1, 0], [0, 1, 1], [0, 0, 1]]), np.array([[0, 1, 1], [1, 1, 0]])],
+    4: [np.array([[0, 1, 0], [0, 1, 0], [1, 1, 0]]), np.array([[0, 0, 0], [1, 1, 1], [0, 0, 1]]), np.array([[0, 1, 1], [0, 1, 0], [0, 1, 0]]), np.array([[1, 0, 0], [1, 1, 1]])],
+    5: [np.array([[1, 1, 0], [0, 1, 0], [0, 1, 0]]), np.array([[0, 0, 0], [1, 1, 1], [1, 0 , 0]]), np.array([[0, 1, 0], [0, 1, 0], [0, 1, 1]]), np.array([[0, 0, 1], [1, 1, 1]])],
+    6: [np.array([[0, 1], [0, 1], [0, 1], [0, 1]]), np.array([[0, 0, 0, 0], [0, 0, 0, 0], [1, 1, 1, 1]]), np.array([[0, 0, 1], [0, 0, 1], [0, 0, 1], [0, 0, 1]]), np.array([[0, 0, 0, 0], [1, 1, 1, 1]])],
+    7: [np.array([[1, 1], [1, 1]]), np.array([[1, 1], [1, 1]]), np.array([[1, 1], [1, 1]]), np.array([[1, 1], [1, 1]])],
+    8: [np.array([[0, 1, 0], [1, 1, 0], [1, 0, 0]]), np.array([[0, 0, 0], [1, 1, 0], [0, 1, 1]]), np.array([[0, 0, 1], [0, 1, 1], [0, 1, 0]]), np.array([[1, 1, 0], [0, 1, 1]])]
 }
 
 blocks_image = {
-    "blue": pygame.transform.scale(pygame.image.load("assets/blue_block.png"), (BlockSize, BlockSize)),
-    "cyan": pygame.transform.scale(pygame.image.load("assets/cyan_block.png"), (BlockSize, BlockSize)),
-    "green": pygame.transform.scale(pygame.image.load("assets/green_block.png"), (BlockSize, BlockSize)),
-    "pink": pygame.transform.scale(pygame.image.load("assets/pink_block.png"), (BlockSize, BlockSize)),
-    "purple": pygame.transform.scale(pygame.image.load("assets/purple_block.png"), (BlockSize, BlockSize)),
-    "red": pygame.transform.scale(pygame.image.load("assets/red_block.png"), (BlockSize, BlockSize)),
-    "yellow": pygame.transform.scale(pygame.image.load("assets/yellow_block.png"), (BlockSize, BlockSize)),
+    2: pygame.transform.scale(pygame.image.load("assets/blue_block.png"), (BlockSize, BlockSize)),
+    3: pygame.transform.scale(pygame.image.load("assets/cyan_block.png"), (BlockSize, BlockSize)),
+    4: pygame.transform.scale(pygame.image.load("assets/green_block.png"), (BlockSize, BlockSize)),
+    5: pygame.transform.scale(pygame.image.load("assets/pink_block.png"), (BlockSize, BlockSize)),
+    6: pygame.transform.scale(pygame.image.load("assets/purple_block.png"), (BlockSize, BlockSize)),
+    7: pygame.transform.scale(pygame.image.load("assets/red_block.png"), (BlockSize, BlockSize)),
+    8: pygame.transform.scale(pygame.image.load("assets/yellow_block.png"), (BlockSize, BlockSize)),
 }
 
 class MovableBlocks:
 
     def __init__(self, color=random.choices(list(blocks.keys()))[0]):
         self.speed = 1
-        self.color = color
+        self.color_value = color
         self.state = 0
-        self.array = blocks[self.color][self.state]
+        self.array = blocks[self.color_value][self.state]
         self.put = False
         self.movable = True
         # we get the coordinates of each block of the movable_blocks
@@ -68,7 +68,7 @@ class MovableBlocks:
             self.state = 0
 
     def update_array(self):
-        self.array = blocks[self.color][self.state]
+        self.array = blocks[self.color_value][self.state]
 
     def move_down(self):
         self.pos[0] += 1
@@ -92,17 +92,15 @@ class MovableBlocks:
             a[self.co[i][0], self.co[i][1] + 1] = 1
 
 
-
 def insert_blocks():
-
     y = movable_blocks.pos[0] + movable_blocks.array.shape[0]
     x = movable_blocks.pos[1] + movable_blocks.array.shape[1]
     # if there's a put block where the blocks must generate
-    if 2 in a[movable_blocks.pos[0]:y, movable_blocks.pos[1]:x]:
-        pygame.quit()
-        running = False
-    else:
-        a[movable_blocks.pos[0]:y, movable_blocks.pos[1]:x] = movable_blocks.array
+    for color_value in range(2, 9):
+        if color_value in a[movable_blocks.pos[0]:y, movable_blocks.pos[1]:x]:
+            pygame.quit()
+            running = False
+    a[movable_blocks.pos[0]:y, movable_blocks.pos[1]:x] = movable_blocks.array
 
 
 def move_line_down(y):
@@ -159,6 +157,7 @@ offset = 20
 # creating the right part of the screen
 pygame.draw.rect(screen, [0, 0, 255], ((playing_screen_size[0], 0), (10, screen_size[1])))
 
+stop = False
 
 # c is a counter of the number of iterations of the main loop
 c = 0
@@ -170,9 +169,11 @@ while running:
     for y in range(a.shape[0]):
         for x in range(a.shape[1]):
             if a[y, x] == 1:
-                screen.blit(blocks_image[movable_blocks.color], (x*BlockSize, y*BlockSize, BlockSize, BlockSize))
+                screen.blit(blocks_image[movable_blocks.color_value], (x*BlockSize, y*BlockSize, BlockSize, BlockSize))
             elif a[y, x] == 0:
                 pygame.draw.rect(screen, [0, 0, 0], (x*BlockSize, y*BlockSize, BlockSize, BlockSize))
+            else:
+                screen.blit(blocks_image[int(a[y, x])], (x * BlockSize, y * BlockSize, BlockSize, BlockSize))
 
     # checks if a line of a is only made of 2s, if so we move all the lines higher than this line down
     for i in range(a.shape[0]):
@@ -187,13 +188,13 @@ while running:
         # getting the co of the blocks before moving them
         movable_blocks.co = movable_blocks.get_co(a, True)
 
-        print(a)
 
         # checks if the blocks can move down
         for i in range(len(movable_blocks.co)):
-            # checks if the block below is not a put block or the end of the screen
-            if movable_blocks.co[i][0] + 1 >= playing_screen_size[1] // BlockSize or a[movable_blocks.co[i][0] + 1, movable_blocks.co[i][1]] == 2:
+            # checks if the block below is not a put block or the end of the screen                                                     range(2, 9) correspond to all the possible values for a put block
+            if movable_blocks.co[i][0] + 1 >= playing_screen_size[1] // BlockSize or a[movable_blocks.co[i][0] + 1, movable_blocks.co[i][1]] in range(2, 9):
                 movable_blocks.put = True
+                print(a)
                 break
 
         # if the block can move down then it moves down
@@ -202,7 +203,9 @@ while running:
         else:
             # else, we create new blocks
             for co in movable_blocks.co:
-                a[co[0], co[1]] = 2
+                # creating the put blocks with the blocks color
+                a[co[0], co[1]] = movable_blocks.color_value
+
             movable_blocks = MovableBlocks(next_color)
             insert_blocks()
             next_color = random.choices(list(blocks.keys()))[0]
@@ -234,7 +237,7 @@ while running:
                     # calculates the co  of the new blocks on the main array a
                     new_co[i] = (new_co[i][0] + movable_blocks.pos[0], new_co[i][1] + movable_blocks.pos[1])
                     # checks if the blocks can turn without hitting put blocks or going out of the screen
-                    if 0 > new_co[i][0] or new_co[i][0] >= playing_screen_size[1] // BlockSize or 0 > new_co[i][1] or new_co[i][1] >= playing_screen_size[0] // BlockSize or a[new_co[i]] == 2:
+                    if 0 > new_co[i][0] or new_co[i][0] >= playing_screen_size[1] // BlockSize or 0 > new_co[i][1] or new_co[i][1] >= playing_screen_size[0] // BlockSize or a[new_co[i]] in range(2, 9):
                         movable_blocks.movable = False
 
                 if movable_blocks.movable:
@@ -252,8 +255,7 @@ while running:
 
                 for i in range(len(movable_blocks.co)):
                     # checks if the block on the right is not a put block or the end of the screen
-                    if movable_blocks.co[i][1] + 1 >= playing_screen_size[0] // BlockSize or a[movable_blocks.co[i][0], movable_blocks.co[i][1] + 1] == 2:
-                        print("yes")
+                    if movable_blocks.co[i][1] + 1 >= playing_screen_size[0] // BlockSize or a[movable_blocks.co[i][0], movable_blocks.co[i][1] + 1] in range(2, 9):
                         movable_blocks.movable = False
                         break
 
@@ -270,7 +272,7 @@ while running:
 
                 for i in range(len(movable_blocks.co)):
                     # checks if the block on the right is not a put block or the end of the screen
-                    if movable_blocks.co[i][1] - 1 == -1 or a[movable_blocks.co[i][0], movable_blocks.co[i][1] - 1] == 2:
+                    if movable_blocks.co[i][1] - 1 == -1 or a[movable_blocks.co[i][0], movable_blocks.co[i][1] - 1] in range(2, 9):
                         movable_blocks.movable = False
                         break
 
