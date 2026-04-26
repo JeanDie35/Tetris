@@ -62,10 +62,15 @@ class MovableBlocks:
         # you must reverse it or not depending on where the block will move, to understand this better make a scheme
         return sorted(list(zip(arr_co[0], arr_co[1])), reverse=reverse)
 
-    def turn(self):
+    def turn_right(self):
         self.state += 1
         if self.state >= 4:
             self.state = 0
+
+    def turn_left(self):
+        self.state -= 1
+        if self.state <= -1:
+            self.state = 3
 
     def update_array(self):
         self.array = blocks[self.color_value][self.state]
@@ -157,13 +162,11 @@ offset = 20
 # creating the right part of the screen
 pygame.draw.rect(screen, [0, 0, 255], ((playing_screen_size[0], 0), (10, screen_size[1])))
 
-stop = False
 
 # c is a counter of the number of iterations of the main loop
 c = 0
 
 while running:
-
 
     # updating the blocks
     for y in range(a.shape[0]):
@@ -183,6 +186,7 @@ while running:
             if line_broken % 10 == 0:
                 normal_speed += 0.5
 
+    print(c, movable_blocks.speed)
     if c % int(15/movable_blocks.speed) == 0:
 
         # getting the co of the blocks before moving them
@@ -194,7 +198,6 @@ while running:
             # checks if the block below is not a put block or the end of the screen                                                     range(2, 9) correspond to all the possible values for a put block
             if movable_blocks.co[i][0] + 1 >= playing_screen_size[1] // BlockSize or a[movable_blocks.co[i][0] + 1, movable_blocks.co[i][1]] in range(2, 9):
                 movable_blocks.put = True
-                print(a)
                 break
 
         # if the block can move down then it moves down
@@ -223,12 +226,18 @@ while running:
 
         if event.type == pygame.KEYDOWN:
 
-            if event.key == pygame.K_UP:
+            if event.key == pygame.K_RIGHT or event.key == pygame.K_LEFT:
 
                 # getting the actual co of the blocks
                 movable_blocks.co = movable_blocks.get_co(a, False)
 
-                movable_blocks.turn()
+                if event.key == pygame.K_RIGHT:
+                    movable_blocks.turn_right()
+
+                elif event.key == pygame.K_LEFT:
+                    movable_blocks.turn_left()
+
+
                 movable_blocks.update_array()
                 # getting the new co of the blocks, after turning
                 new_co = movable_blocks.get_co(movable_blocks.array, False)
@@ -248,7 +257,7 @@ while running:
                         a[new_co[i]] = 1
                 movable_blocks.movable = True
 
-            elif event.key == pygame.K_RIGHT:
+            elif event.key == pygame.K_d:
 
                 # checking if the shape can move right
                 movable_blocks.co = movable_blocks.get_co(a, True)
@@ -265,7 +274,7 @@ while running:
 
                 movable_blocks.movable = True
 
-            elif event.key == pygame.K_LEFT:
+            elif event.key == pygame.K_q:
 
                 # checks if the shape can move left
                 movable_blocks.co = movable_blocks.get_co(a, False)
@@ -282,11 +291,14 @@ while running:
 
                 movable_blocks.movable = True
 
-            elif event.key == pygame.K_DOWN:
+            if event.key == pygame.K_s:
                 movable_blocks.speed = 3*normal_speed
 
-        else:
-            movable_blocks.speed = normal_speed
+        elif event.type == pygame.KEYUP:
+
+            if event.key == pygame.K_s:
+                movable_blocks.speed = normal_speed
+
 
     c += 1
     clock.tick(FPS)
