@@ -1,8 +1,6 @@
 import pygame
 pygame.init()
 pygame.font.init()
-import numpy as np
-import random
 from game import *
 
 BgColor = [0, 0, 0]
@@ -21,12 +19,6 @@ Careful:
 """""
 
 
-
-
-
-
-
-
 running = True
 
 pygame.display.set_caption("Tetris")
@@ -34,26 +26,24 @@ screen_size = (500, 600)
 screen = pygame.display.set_mode(screen_size)
 
 game = Game(screen, Font)
-playing = True
 
+active_frame = game
 
 
 while running:
 
-    if playing:
-        game.update()
 
-    elif not playing:
-        pass
+    active_frame.update()
+
 
     for event in pygame.event.get():
 
         if event.type == pygame.QUIT:
             pygame.quit()
-            running = False
+            playing = False
 
         if event.type == pygame.KEYDOWN:
-            if playing:
+            if active_frame == game:
                 if event.key == pygame.K_RIGHT or event.key == pygame.K_LEFT:
 
                     # getting the actual co of the blocks
@@ -124,7 +114,7 @@ while running:
 
         elif event.type == pygame.KEYUP:
 
-            if playing:
+            if active_frame == game:
                 if event.key == pygame.K_s:
                     game.movable_blocks.speed = game.normal_speed
 
