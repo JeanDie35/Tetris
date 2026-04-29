@@ -29,6 +29,7 @@ screen = pygame.display.set_mode(screen_size)
 welcome = Welcome(screen, Font)
 game = Game(screen, Font)
 settings = Settings(screen, Font, game)
+game_over = GameOver(screen, Font)
 
 active_frame = welcome
 
@@ -36,17 +37,18 @@ while running:
 
     active_frame.update()
 
+    if active_frame == game and game.over:
+        # hiding the game widgets
+        screen.fill("black")
+        active_frame = game_over
+        game_over.score = game.score
+
 
     for event in pygame.event.get():
 
         if event.type == pygame.QUIT:
             pygame.quit()
             playing = False
-
-        if active_frame == game and game.over:
-            # hiding the game widgets
-            screen.fill("black")
-            active_frame = welcome
 
         if event.type == pygame.KEYDOWN:
             if active_frame == game:
@@ -139,6 +141,13 @@ while running:
 
             elif active_frame == settings:
                 if settings.back_rect.collidepoint(event.pos):
+                    active_frame = welcome
+                    screen.fill("black")
+
+            elif active_frame == game_over:
+                if game_over.back_rect.collidepoint(event.pos):
+                    game_over.save_best_score()
+                    game.reset()
                     active_frame = welcome
                     screen.fill("black")
 

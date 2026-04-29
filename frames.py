@@ -54,13 +54,38 @@ class Settings(Frame):
 
 class GameOver(Frame):
 
-    def __init__(self, screen, font, score):
+    def __init__(self, screen, font):
         super().__init__(screen, font)
-        self.score = score
+        self.score = 0
 
         self.assets = {
-            "back": pygame.image.load("assets/back_button.png.png"),
+            "back": pygame.image.load("assets/back_button.png"),
+            "victory": pygame.image.load("assets/victory.png")
         }
+        self.back_rect = self.assets["back"].get_rect()
+        self.back_rect.x, self.back_rect.y = (0 + self.back_rect.width // 2, self.screen.get_height() - self.back_rect.height - 20)
+
+        file = open("best_score.txt", "r")
+        self.best_score = int(file.readlines()[0])
+        file.close()
 
     def update(self):
-        pass
+
+        self.best_score = max(self.best_score, self.score)
+        best_score_text = self.font.render(f"Best score : {self.best_score}", 1, (255, 255, 255))
+        self.screen.blit(best_score_text, (self.screen.get_width() // 2 - best_score_text.get_width() // 2,
+                                      self.screen.get_height() // 2 - best_score_text.get_height() // 2))
+
+        score_text = self.font.render(f"Your score : {self.score}", 1, (255, 255, 255))
+        self.screen.blit(score_text, (self.screen.get_width() // 2 - score_text.get_width() // 2,
+                                      3 * self.screen.get_height() // 4 - score_text.get_height() // 2))
+
+        self.screen.blit(self.assets["back"], self.back_rect)
+
+        self.screen.blit(self.assets["victory"], (self.screen.get_width() // 2 - self.assets["victory"].get_width() // 2,
+                                      self.screen.get_height() // 4 - self.assets["victory"].get_height() // 4))
+
+    def save_best_score(self):
+        file = open("best_score.txt", "w")
+        file.write(str(self.best_score))
+        file.close()

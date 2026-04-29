@@ -120,6 +120,7 @@ class Game:
         self.line_broke = 0
         self.score = 0
         self.counter = 0
+        self.over = False
         # creating the numpy array
         self.arr_size = (self.playing_screen_size[1] // BlockSize, self.playing_screen_size[0] // BlockSize)
         self.a = np.zeros(self.arr_size)
@@ -205,7 +206,7 @@ class Game:
                 self.movable_blocks = MovableBlocks(self, self.next_color)
                 self.insert_blocks()
                 self.next_color = random.choices(list(blocks.keys()))[0]
-                if not self.game_over:
+                if not self.over:
                     self.score += 4
 
 
