@@ -2,6 +2,7 @@ import pygame
 pygame.init()
 pygame.font.init()
 from game import *
+from frames import *
 
 BgColor = [0, 0, 0]
 Font = pygame.font.SysFont("Comic Sans MS", 25)
@@ -25,13 +26,13 @@ pygame.display.set_caption("Tetris")
 screen_size = (500, 600)
 screen = pygame.display.set_mode(screen_size)
 
+welcome = Welcome(screen, Font)
 game = Game(screen, Font)
+settings = Settings(screen, Font, game)
 
-active_frame = game
-
+active_frame = welcome
 
 while running:
-
 
     active_frame.update()
 
@@ -42,8 +43,14 @@ while running:
             pygame.quit()
             playing = False
 
+        if active_frame == game and game.over:
+            # hiding the game widgets
+            screen.fill("black")
+            active_frame = welcome
+
         if event.type == pygame.KEYDOWN:
             if active_frame == game:
+
                 if event.key == pygame.K_RIGHT or event.key == pygame.K_LEFT:
 
                     # getting the actual co of the blocks
@@ -118,5 +125,25 @@ while running:
                 if event.key == pygame.K_s:
                     game.movable_blocks.speed = game.normal_speed
 
-    game.counter += 1
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+
+            if active_frame == welcome:
+                if welcome.play_rect.collidepoint(event.pos):
+                    active_frame = game
+                    # we hide the welcome assets
+                    screen.fill("black")
+
+                if welcome.settings_rect.collidepoint(event.pos):
+                    screen.fill("black")
+                    active_frame = settings
+
+            elif active_frame == settings:
+                if settings.back_rect.collidepoint(event.pos):
+                    active_frame = welcome
+                    screen.fill("black")
+
+    if active_frame == game:
+        game.counter += 1
+
+    pygame.display.flip()
     clock.tick(FPS)

@@ -17,13 +17,13 @@ blocks = {
 }
 
 blocks_image = {
-    2: pygame.transform.scale(pygame.image.load("assets/blue_block.png"), (BlockSize, BlockSize)),
-    3: pygame.transform.scale(pygame.image.load("assets/cyan_block.png"), (BlockSize, BlockSize)),
-    4: pygame.transform.scale(pygame.image.load("assets/green_block.png"), (BlockSize, BlockSize)),
-    5: pygame.transform.scale(pygame.image.load("assets/pink_block.png"), (BlockSize, BlockSize)),
-    6: pygame.transform.scale(pygame.image.load("assets/purple_block.png"), (BlockSize, BlockSize)),
-    7: pygame.transform.scale(pygame.image.load("assets/red_block.png"), (BlockSize, BlockSize)),
-    8: pygame.transform.scale(pygame.image.load("assets/yellow_block.png"), (BlockSize, BlockSize)),
+    2: pygame.transform.scale(pygame.image.load("assets/blocks/blue_block.png"), (BlockSize, BlockSize)),
+    3: pygame.transform.scale(pygame.image.load("assets/blocks/cyan_block.png"), (BlockSize, BlockSize)),
+    4: pygame.transform.scale(pygame.image.load("assets/blocks/green_block.png"), (BlockSize, BlockSize)),
+    5: pygame.transform.scale(pygame.image.load("assets/blocks/pink_block.png"), (BlockSize, BlockSize)),
+    6: pygame.transform.scale(pygame.image.load("assets/blocks/purple_block.png"), (BlockSize, BlockSize)),
+    7: pygame.transform.scale(pygame.image.load("assets/blocks/red_block.png"), (BlockSize, BlockSize)),
+    8: pygame.transform.scale(pygame.image.load("assets/blocks/yellow_block.png"), (BlockSize, BlockSize)),
 }
 
 
@@ -84,23 +84,25 @@ class MovableBlocks:
 
 class Game:
 
-    def __init__(self, screen, font):
+    def __init__(self, screen, font: pygame.font.Font):
         self.screen = screen
         self.playing_screen_size = (300, 600)
         # creating the numpy array
-        arr_size = (self.playing_screen_size[1] // BlockSize, self.playing_screen_size[0] // BlockSize)
-        self.a = np.zeros(arr_size)
+        self.arr_size = (self.playing_screen_size[1] // BlockSize, self.playing_screen_size[0] // BlockSize)
+        self.a = np.zeros(self.arr_size)
 
         self.movable_blocks = MovableBlocks(game=self)
         self.insert_blocks()
 
         self.next_color = random.choices(list(blocks.keys()))[0]
-        self.line_broken = 0
+        self.line_broke = 0
         self.score = 0
         # var stores the normal speed, when k up isn't pressed
         self.normal_speed = 1
 
         self.offset = 20
+
+        self.over = False
 
         self.font = font
         self.counter = 0
@@ -111,9 +113,19 @@ class Game:
         # if there's a put block where the blocks must generate
         for color_value in range(2, 9):
             if color_value in self.a[self.movable_blocks.pos[0]:y, self.movable_blocks.pos[1]:x]:
-                pygame.quit()
-                running = False
+                self.over = True
         self.a[self.movable_blocks.pos[0]:y, self.movable_blocks.pos[1]:x] = self.movable_blocks.array
+
+    def reset(self):
+        self.line_broke = 0
+        self.score = 0
+        self.counter = 0
+        # creating the numpy array
+        self.arr_size = (self.playing_screen_size[1] // BlockSize, self.playing_screen_size[0] // BlockSize)
+        self.a = np.zeros(self.arr_size)
+
+        self.movable_blocks = MovableBlocks(game=self)
+        self.insert_blocks()
 
     def move_line_down(self, y):
         # move all the line higher than y by one block
@@ -193,7 +205,8 @@ class Game:
                 self.movable_blocks = MovableBlocks(self, self.next_color)
                 self.insert_blocks()
                 self.next_color = random.choices(list(blocks.keys()))[0]
-                self.score += 4
+                if not self.game_over:
+                    self.score += 4
 
-        pygame.display.flip()
+
         self.update_displays()
