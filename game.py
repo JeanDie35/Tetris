@@ -84,9 +84,10 @@ class MovableBlocks:
 
 class Game:
 
-    def __init__(self, screen, font: pygame.font.Font):
+    def __init__(self, screen, config):
         self.screen = screen
-        self.playing_screen_size = (300, 600)
+        self.config = config
+        self.playing_screen_size = (self.config.data["playing_screen_width"], self.config.data["playing_screen_height"])
         # creating the numpy array
         self.arr_size = (self.playing_screen_size[1] // BlockSize, self.playing_screen_size[0] // BlockSize)
         self.a = np.zeros(self.arr_size)
@@ -98,22 +99,16 @@ class Game:
         self.line_broke = 0
         self.score = 0
         # var stores the normal speed, when k up isn't pressed
-        self.normal_speed = 1
+        self.normal_speed = self.config.data["normal_speed"]
 
         self.offset = 20
 
         self.over = False
 
-        self.font = font
+        self.font = pygame.font.SysFont(self.config.data["font_name"], self.config.data["font_size"])
         self.counter = 0
 
-        self.key_binds = {
-        "right": 0,
-        "left": 0,
-        "turn right": 0,
-        "turn left": 0,
-        "speed up": 0
-        }
+        self.key_binds = self.config.data["key_binds"]
 
     def insert_blocks(self):
         y = self.movable_blocks.pos[0] + self.movable_blocks.array.shape[0]

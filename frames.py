@@ -12,9 +12,10 @@ special_keys = {
 # parent class for all the different frames there's
 class Frame:
 
-    def __init__(self, screen, font):
+    def __init__(self, screen, config):
         self.screen = screen
-        self.font = font
+        self.config = config
+        self.font = pygame.font.SysFont(self.config.data["font_name"], self.config.data["font_size"])
 
     def update(self):
         pass
@@ -23,9 +24,9 @@ class Frame:
 # thr frame that will be displayed when you launch the app
 class Welcome(Frame):
 
-    def __init__(self, screen, font: pygame.font.Font):
+    def __init__(self, screen, config):
 
-        super().__init__(screen, font)
+        super().__init__(screen, config)
         # the images that will be displayed on this frame
         self.assets = {
             "logo" : pygame.image.load("assets/logo.png"),
@@ -50,8 +51,8 @@ class Welcome(Frame):
 # the frame where you can change the key binds
 class Settings(Frame):
 
-    def __init__(self, screen, font: pygame.font.Font, game):
-        super().__init__(screen, font)
+    def __init__(self, screen, config, game):
+        super().__init__(screen, config)
 
         self.game = game
         self.assets = {
@@ -63,11 +64,11 @@ class Settings(Frame):
 
         # creating a dict to store all the key selectors depending on what key are they bound to
         self.key_selectors = {
-        "right": KeySelector(self.screen, "d", 65, self.font),
-        "left": KeySelector(self.screen, "q", 155, self.font),
-        "turn right": KeySelector(self.screen, "left arrow", 245, self.font),
-        "turn left": KeySelector(self.screen, "right arrow", 335, self.font),
-        "speed up": KeySelector(self.screen, "s", 425, self.font)
+        "right": KeySelector(self.screen, self.config.data["key_binds"]["right"], 65, self.config),
+        "left": KeySelector(self.screen, self.config.data["key_binds"]["left"], 155, self.config),
+        "turn right": KeySelector(self.screen, self.config.data["key_binds"]["turn right"], 245, self.config),
+        "turn left": KeySelector(self.screen, self.config.data["key_binds"]["turn left"], 335, self.config),
+        "speed up": KeySelector(self.screen, self.config.data["key_binds"]["speed up"], 425, self.config)
         }
 
 
@@ -84,24 +85,15 @@ class Settings(Frame):
             # displays the key selctor
             self.key_selectors[list(self.key_selectors.keys())[i]].display()
 
-    def get_key(self, movement):
-        # returns the key that the user chose to bound to movement
-        key = 0
-        # if the movement is in the special keys
-        for item in special_keys.items():
-            if item[1] == self.key_selectors[movement].key:
-                key = item[0]
-        # if the key isn't we can use ord()
-        if key == 0:
-            key = ord(self.key_selectors[movement].key)
-        return key
+    def get_key_movement(self, movement):
+        return self.key_selectors[movement].nkey
 
 # frame when the game is over
 class GameOver(Frame):
 
 
-    def __init__(self, screen, font):
-        super().__init__(screen, font)
+    def __init__(self, screen, config):
+        super().__init__(screen, config)
         self.score = 0
 
         self.assets = {
@@ -112,9 +104,8 @@ class GameOver(Frame):
         self.back_rect = self.assets["back"].get_rect()
         self.back_rect.x, self.back_rect.y = (0 + self.back_rect.width // 2, self.screen.get_height() - self.back_rect.height - 20)
 
-        file = open("best_score.txt", "r")
-        self.best_score = int(file.readlines()[0])
-        file.close()
+
+        self.best_score = self.config.data["best_score"]
 
     def update(self):
         # displays the elements of the frame
@@ -140,11 +131,12 @@ class GameOver(Frame):
 
 class KeySelector:
 
-    def __init__(self, screen, key, y, font):
+    def __init__(self, screen, nkey, y, config):
         self.screen = screen
-        self.font = font
+        self.font = pygame.font.SysFont(config.data["font_name"], config.data["font_size"])
+
         # the key that it is displaying
-        self.key = key
+        self.nkey = nkey
         self.selected = False
         self.size = (200, 50)
         self.rect = pygame.rect.Rect((self.screen.get_width() // 2 - self.size[0] // 2, y), (self.size))
@@ -153,18 +145,24 @@ class KeySelector:
 
         pygame.draw.rect(self.screen, [200, 200, 200], self.rect)
 
-        key_text = self.font.render(str(self.key), 1, [255, 255, 255])
+        key_text = self.font.render(self.get_key(self.nkey), 1, [255, 255, 255])
         self.screen.blit(key_text, (self.rect.x + self.rect.w // 2 - key_text.get_width() // 2, self.rect.y + self.rect.h // 2 - key_text.get_height() // 2))
 
 
     def change_key(self, n):
-        try:
-            if n in list(special_keys.keys()):
-                self.key = special_keys[n]
-            else:
-                self.key = chr(n)
-        # if the key isn't a letter or an arrow, it will trigger an error because n will be too big for chr() function
+        # we call the get_key method, if the chr() function can't handle the number, it raises an error which is then caught
+        # if there's no error, the second will be executed
+        try :
+            self.get_key(n)
+            self.nkey = n
         except ValueError:
-            print("You can't use that key, please try another one")
+            print("You can't use that key, please enter another one")
+
+
+    def get_key(self, nkey):
+        if nkey in special_keys.keys():
+            return special_keys[nkey]
+        else:
+            return chr(nkey)
 
 

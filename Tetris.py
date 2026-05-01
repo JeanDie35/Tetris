@@ -3,12 +3,14 @@ pygame.init()
 pygame.font.init()
 from game import *
 from frames import *
+from config import *
 
-BgColor = [0, 0, 0]
-Font = pygame.font.SysFont("Comic Sans MS", 25)
+config = Config()
+
+Font = pygame.font.SysFont(config.data["font_name"], config.data["font_size"])
 
 clock = pygame.time.Clock()
-FPS = 60
+FPS = config.data["FPS"]
 
 """""
 Careful:
@@ -22,14 +24,14 @@ Careful:
 
 running = True
 
-pygame.display.set_caption("Tetris")
-screen_size = (500, 600)
+pygame.display.set_caption(config.data["title"])
+screen_size = (config.data["screen_width"], config.data["screen_height"])
 screen = pygame.display.set_mode(screen_size)
 
-welcome = Welcome(screen, Font)
-game = Game(screen, Font)
-settings = Settings(screen, Font, game)
-game_over = GameOver(screen, Font)
+welcome = Welcome(screen, config)
+game = Game(screen, config)
+settings = Settings(screen, config, game)
+game_over = GameOver(screen, config)
 
 active_frame = welcome
 
@@ -39,7 +41,7 @@ while running:
 
     if active_frame == game and game.over:
         # hiding the game widgets
-        screen.fill("black")
+        screen.fill(config.data["bg_color"])
         active_frame = game_over
         game_over.score = game.score
 
@@ -47,6 +49,8 @@ while running:
     for event in pygame.event.get():
 
         if event.type == pygame.QUIT:
+            # saving all the data
+            config.save_file()
             pygame.quit()
             playing = False
 
@@ -140,20 +144,25 @@ while running:
                 if welcome.play_rect.collidepoint(event.pos):
                     # assigning the chosen keys to game
                     for key in game.key_binds.keys():
-                        game.key_binds[key] = settings.get_key(key)
+                        game.key_binds[key] = settings.get_key_movement(key)
                     active_frame = game
                     # we hide the welcome assets
-                    screen.fill("black")
+                    screen.fill(config.data["bg_color"])
 
                 if welcome.settings_rect.collidepoint(event.pos):
-                    screen.fill("black")
+                    screen.fill(config.data["bg_color"])
                     active_frame = settings
 
             elif active_frame == settings:
 
                 if settings.back_rect.collidepoint(event.pos):
                     active_frame = welcome
-                    screen.fill("black")
+                    # saving the key binds
+                    for nkey in game.key_binds.keys():
+                        config.data["key_binds"][nkey] = settings.get_key_movement(nkey)
+
+
+                    screen.fill(config.data["bg_color"])
 
                 # if the user clicks on a key selector, it becomes selected
                 for k_selector in settings.key_selectors.items():
@@ -164,10 +173,9 @@ while running:
 
             elif active_frame == game_over:
                 if game_over.back_rect.collidepoint(event.pos):
-                    game_over.save_best_score()
                     game.reset()
                     active_frame = welcome
-                    screen.fill("black")
+                    screen.fill(config.data["bg_color"])
 
     if active_frame == game:
         game.counter += 1
