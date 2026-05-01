@@ -15,7 +15,7 @@
     "font_size": 25,
     "FPS": 60,
     "key_binds": {
-        "right": 100,
+        "right": 97,
         "left": 113,
         "speed up": 115,
         "turn right": 1073741904,

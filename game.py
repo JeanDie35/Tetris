@@ -96,7 +96,7 @@ class Game:
         self.insert_blocks()
 
         self.next_color = random.choices(list(blocks.keys()))[0]
-        self.line_broke = 0
+        self.line_broken = 0
         self.score = 0
         # var stores the normal speed, when k up isn't pressed
         self.normal_speed = self.config.data["normal_speed"]
