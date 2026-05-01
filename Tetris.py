@@ -35,9 +35,10 @@ game_over = GameOver(screen, config)
 
 active_frame = welcome
 
-while running:
 
+while running:
     active_frame.update()
+    pygame.display.flip()
 
     if active_frame == game and game.over:
         # hiding the game widgets
@@ -52,7 +53,7 @@ while running:
             # saving all the data
             config.save_file()
             pygame.quit()
-            playing = False
+            running = False
 
         if event.type == pygame.KEYDOWN:
             if active_frame == game:
@@ -179,6 +180,5 @@ while running:
 
     if active_frame == game:
         game.counter += 1
-
-    pygame.display.flip()
+        
     clock.tick(FPS)

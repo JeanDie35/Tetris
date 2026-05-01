@@ -5,7 +5,6 @@ class Config:
     def __init__(self):
         self.file_name = "config.json"
         self.data = self.get_data()
-        print(self.data)
 
     def save_file(self):
         with open(self.file_name, "w") as file:
