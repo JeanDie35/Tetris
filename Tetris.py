@@ -53,15 +53,15 @@ while running:
         if event.type == pygame.KEYDOWN:
             if active_frame == game:
 
-                if event.key == pygame.K_RIGHT or event.key == pygame.K_LEFT:
+                if event.key == game.key_binds["turn right"] or event.key == game.key_binds["turn left"]:
 
                     # getting the actual co of the blocks
                     game.movable_blocks.co = game.movable_blocks.get_co(game.a, False)
 
-                    if event.key == pygame.K_RIGHT:
+                    if event.key == game.key_binds["turn right"]:
                         game.movable_blocks.turn_right()
 
-                    elif event.key == pygame.K_LEFT:
+                    elif event.key == game.key_binds["turn left"]:
                         game.movable_blocks.turn_left()
 
 
@@ -84,7 +84,7 @@ while running:
                             game.a[new_co[i]] = 1
                     game.movable_blocks.movable = True
 
-                elif event.key == pygame.K_d:
+                if event.key == game.key_binds["right"]:
 
                     # checking if the shape can move right
                     game.movable_blocks.co = game.movable_blocks.get_co(game.a, True)
@@ -101,7 +101,7 @@ while running:
 
                     game.movable_blocks.movable = True
 
-                elif event.key == pygame.K_q:
+                elif event.key == game.key_binds["left"]:
 
                     # checks if the shape can move left
                     game.movable_blocks.co = game.movable_blocks.get_co(game.a, False)
@@ -118,19 +118,29 @@ while running:
 
                     game.movable_blocks.movable = True
 
-                if event.key == pygame.K_s:
+                if event.key == game.key_binds["speed up"]:
                     game.movable_blocks.speed = 3*game.normal_speed
+
+            elif active_frame == settings:
+
+                for k_selector in settings.key_selectors.items():
+                    # if a key selector is selected, its key will be the pressed one
+                    if k_selector[1].selected:
+                        k_selector[1].change_key(event.key)
 
         elif event.type == pygame.KEYUP:
 
             if active_frame == game:
-                if event.key == pygame.K_s:
+                if event.key == game.key_binds["speed up"]:
                     game.movable_blocks.speed = game.normal_speed
 
         elif event.type == pygame.MOUSEBUTTONDOWN:
 
             if active_frame == welcome:
                 if welcome.play_rect.collidepoint(event.pos):
+                    # assigning the chosen keys to game
+                    for key in game.key_binds.keys():
+                        game.key_binds[key] = settings.get_key(key)
                     active_frame = game
                     # we hide the welcome assets
                     screen.fill("black")
@@ -140,9 +150,17 @@ while running:
                     active_frame = settings
 
             elif active_frame == settings:
+
                 if settings.back_rect.collidepoint(event.pos):
                     active_frame = welcome
                     screen.fill("black")
+
+                # if the user clicks on a key selector, it becomes selected
+                for k_selector in settings.key_selectors.items():
+                    if k_selector[1].rect.collidepoint(event.pos):
+                        k_selector[1].selected = True
+                    else:
+                        k_selector[1].selected = False
 
             elif active_frame == game_over:
                 if game_over.back_rect.collidepoint(event.pos):

@@ -107,6 +107,14 @@ class Game:
         self.font = font
         self.counter = 0
 
+        self.key_binds = {
+        "right": 0,
+        "left": 0,
+        "turn right": 0,
+        "turn left": 0,
+        "speed up": 0
+        }
+
     def insert_blocks(self):
         y = self.movable_blocks.pos[0] + self.movable_blocks.array.shape[0]
         x = self.movable_blocks.pos[1] + self.movable_blocks.array.shape[1]
