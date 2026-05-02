@@ -164,5 +164,3 @@ class KeySelector:
             return special_keys[nkey]
         else:
             return chr(nkey)
-
-
