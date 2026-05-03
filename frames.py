@@ -1,6 +1,7 @@
 import pygame
-pygame.init()
 from config import *
+
+pygame.init()
 
 # all the keys that can't work with chr() or ord() function but we still want to be able to bind them
 special_keys = {
@@ -12,10 +13,11 @@ special_keys = {
 
 config = Config()
 
+
 # parent class for all the different frames there's
 class Frame:
 
-    def __init__(self, screen):
+    def __init__(self, screen: pygame.surface.Surface):
         self.screen = screen
         self.font = pygame.font.SysFont(config.data["font_name"], config.data["font_size"])
 
@@ -26,39 +28,41 @@ class Frame:
 # thr frame that will be displayed when you launch the app
 class Welcome(Frame):
 
-    def __init__(self, screen):
-
+    def __init__(self, screen: pygame.surface.Surface):
         super().__init__(screen)
         # the images that will be displayed on this frame
         self.assets = {
-            "logo" : pygame.image.load("assets/logo.png"),
+            "logo": pygame.image.load("assets/logo.png"),
             "play": pygame.image.load("assets/play_button.png"),
             "settings": pygame.image.load("assets/settings_button.png"),
         }
         # creating a var for the buttons' rect because it'll be needed when cheking if the mouse is on the button
         self.play_rect = self.assets["play"].get_rect()
-        self.play_rect.x, self.play_rect.y = (self.screen.get_width() // 2 - self.assets["play"].get_width() // 2, 3 * self.screen.get_height() // 4 - self.assets["play"].get_width() // 4)
+        self.play_rect.x, self.play_rect.y = (self.screen.get_width() // 2 - self.assets["play"].get_width() // 2,
+                                              3 * self.screen.get_height() // 4 - self.assets["play"].get_width() // 4)
 
         self.settings_rect = self.assets["settings"].get_rect()
         self.settings_rect.x, self.settings_rect.y = (0, 0)
 
     def update(self):
         # displays all the elements of the frame
-        self.screen.blit(self.assets["logo"], (self.screen.get_width() // 2 - self.assets["logo"].get_width() // 2, self.screen.get_height() // 4 - self.assets["logo"].get_width() // 4))
+        self.screen.blit(self.assets["logo"], (self.screen.get_width() // 2 - self.assets["logo"].get_width() // 2,
+                                               self.screen.get_height() // 4 - self.assets["logo"].get_width() // 4))
 
         self.screen.blit(self.assets["play"], self.play_rect)
 
         self.screen.blit(self.assets["settings"], self.settings_rect)
 
+
 # the frame where you can change the key binds
 class Settings(Frame):
 
-    def __init__(self, screen, game):
+    def __init__(self, screen: pygame.surface.Surface, game):
         super().__init__(screen)
 
         self.game = game
         self.assets = {
-            "back" : pygame.image.load("assets/back_button.png"),
+            "back": pygame.image.load("assets/back_button.png"),
         }
         # creating a var for the buttons' rect because it'll be needed when cheking if the mouse is on the button
         self.back_rect = self.assets["back"].get_rect()
@@ -66,13 +70,12 @@ class Settings(Frame):
 
         # creating a dict to store all the key selectors depending on what key are they bound to
         self.key_selectors = {
-        "right": KeySelector(self.screen, config.data["key_binds"]["right"], 65),
-        "left": KeySelector(self.screen, config.data["key_binds"]["left"], 155),
-        "turn right": KeySelector(self.screen, config.data["key_binds"]["turn right"], 245),
-        "turn left": KeySelector(self.screen, config.data["key_binds"]["turn left"], 335),
-        "speed up": KeySelector(self.screen, config.data["key_binds"]["speed up"], 425)
+            "right": KeySelector(self.screen, config.data["key_binds"]["right"], 65),
+            "left": KeySelector(self.screen, config.data["key_binds"]["left"], 155),
+            "turn right": KeySelector(self.screen, config.data["key_binds"]["turn right"], 245),
+            "turn left": KeySelector(self.screen, config.data["key_binds"]["turn left"], 335),
+            "speed up": KeySelector(self.screen, config.data["key_binds"]["speed up"], 425)
         }
-
 
     def update(self):
         # displays all the elements of the frame
@@ -87,14 +90,17 @@ class Settings(Frame):
             # displays the key selctor
             self.key_selectors[list(self.key_selectors.keys())[i]].display()
 
-    def get_key_movement(self, movement):
+    def get_key_movement(self, movement: str) -> int:
+        """""
+        returns the key bound to the movement
+        """""
         return self.key_selectors[movement].nkey
+
 
 # frame when the game is over
 class GameOver(Frame):
 
-
-    def __init__(self, screen):
+    def __init__(self, screen: pygame.surface.Surface):
         super().__init__(screen)
         self.score = 0
 
@@ -104,8 +110,8 @@ class GameOver(Frame):
         }
         # creating a var for the buttons' rect because it'll be needed when cheking if the mouse is on the button
         self.back_rect = self.assets["back"].get_rect()
-        self.back_rect.x, self.back_rect.y = (0 + self.back_rect.width // 2, self.screen.get_height() - self.back_rect.height - 20)
-
+        self.back_rect.x, self.back_rect.y = (0 + self.back_rect.width // 2,
+                                              self.screen.get_height() - self.back_rect.height - 20)
 
         self.best_score = config.data["best_score"]
 
@@ -114,7 +120,7 @@ class GameOver(Frame):
         self.best_score = max(self.best_score, self.score)
         best_score_text = self.font.render(f"Best score : {self.best_score}", 1, config.data["colors"]["white"])
         self.screen.blit(best_score_text, (self.screen.get_width() // 2 - best_score_text.get_width() // 2,
-                                      self.screen.get_height() // 2 - best_score_text.get_height() // 2))
+                                           self.screen.get_height() // 2 - best_score_text.get_height() // 2))
 
         score_text = self.font.render(f"Your score : {self.score}", 1, config.data["colors"]["white"])
         self.screen.blit(score_text, (self.screen.get_width() // 2 - score_text.get_width() // 2,
@@ -122,14 +128,14 @@ class GameOver(Frame):
 
         self.screen.blit(self.assets["back"], self.back_rect)
 
-        self.screen.blit(self.assets["victory"], (self.screen.get_width() // 2 - self.assets["victory"].get_width() // 2,
-                                      self.screen.get_height() // 4 - self.assets["victory"].get_height() // 4))
-
+        self.screen.blit(self.assets["victory"],
+                         (self.screen.get_width() // 2 - self.assets["victory"].get_width() // 2,
+                          self.screen.get_height() // 4 - self.assets["victory"].get_height() // 4))
 
 
 class KeySelector:
 
-    def __init__(self, screen, nkey, y):
+    def __init__(self, screen: pygame.surface.Surface, nkey: int, y: int):
         self.screen = screen
         self.font = pygame.font.SysFont(config.data["font_name"], config.data["font_size"])
 
@@ -137,31 +143,37 @@ class KeySelector:
         self.nkey = nkey
         self.selected = False
         self.size = (200, 50)
-        self.rect = pygame.rect.Rect((self.screen.get_width() // 2 - self.size[0] // 2, y), (self.size))
+        self.rect = pygame.rect.Rect((self.screen.get_width() // 2 - self.size[0] // 2, y), self.size)
 
     def display(self):
+        """""
+        displays the key_selector at its position
+        """""
 
         pygame.draw.rect(self.screen, config.data["colors"]["grey"], self.rect)
 
         key_text = self.font.render(self.get_key(self.nkey), 1, config.data["colors"]["white"])
-        self.screen.blit(key_text, (self.rect.x + self.rect.w // 2 - key_text.get_width() // 2, self.rect.y + self.rect.h // 2 - key_text.get_height() // 2))
+        self.screen.blit(key_text, (self.rect.x + self.rect.w // 2 - key_text.get_width() // 2,
+                                    self.rect.y + self.rect.h // 2 - key_text.get_height() // 2))
 
-
-    def change_key(self, n):
-        # we call the get_key method, if the chr() function can't handle the number, it raises an error which is then caught
+    def change_key(self, nkey: int):
+        """""
+        changes the nkey by n if possible
+        """""
+        # we call the get_key method, if the chr() function can't handle the number,
+        # it raises an error which is then caught
         # if there's no error, the second will be executed
-        try :
-            self.get_key(n)
-            self.nkey = n
+        try:
+            self.get_key(nkey)
+            self.nkey = nkey
         except ValueError:
             print("You can't use that key, please enter another one")
 
-
-    def get_key(self, nkey):
+    def get_key(self, nkey: int) -> str:
+        """""
+        returns the key name corresponding to the nkey
+        """""
         if nkey in special_keys:
             return special_keys[nkey]
         else:
-            try:
-                return chr(nkey)
-            except ValueError:
-                print("You can't use this key, please enter anonther one")
+            return chr(nkey)

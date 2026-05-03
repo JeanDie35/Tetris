@@ -1,9 +1,9 @@
-import pygame
-pygame.init()
-pygame.font.init()
 from game import *
 from frames import *
 from config import *
+import pygame
+pygame.init()
+pygame.font.init()
 
 config = Config()
 
@@ -28,10 +28,10 @@ pygame.display.set_caption(config.data["title"])
 screen_size = (config.data["screen_width"], config.data["screen_height"])
 screen = pygame.display.set_mode(screen_size)
 
-welcome = Welcome(screen, config)
-game = Game(screen, config)
-settings = Settings(screen, config, game)
-game_over = GameOver(screen, config)
+welcome = Welcome(screen)
+game = Game(screen)
+settings = Settings(screen, game)
+game_over = GameOver(screen)
 
 active_frame = welcome
 
@@ -45,7 +45,6 @@ while running:
         screen.fill(config.data["bg_color"])
         active_frame = game_over
         game_over.score = game.score
-
 
     for event in pygame.event.get():
 
@@ -64,24 +63,23 @@ while running:
                     game.movable_blocks.co = game.movable_blocks.get_co(game.a, False)
 
                     if event.key == game.key_binds["turn right"]:
-                        simulate_arr = game.movable_blocks.simulate_right_turn()
+                        turned_array = game.movable_blocks.simulate_right_turn()
 
                     elif event.key == game.key_binds["turn left"]:
-                        simulate_arr = game.movable_blocks.simulate_left_turn()
+                        turned_array = game.movable_blocks.simulate_left_turn()
 
                     # if it can turn
-                    if game.movable_blocks.can_fit(simulate_arr):
+                    if game.movable_blocks.can_fit(turned_array):
                         for y, x in game.movable_blocks.co:
                             game.a[y, x] = 0
 
                         # updating the array
-                        game.movable_blocks.array = simulate_arr
+                        game.movable_blocks.array = turned_array
                         # updating co
                         game.movable_blocks.co = game.movable_blocks.get_co(game.a, False)
 
                         for y, x in game.movable_blocks.co:
                             game.a[y, x] = 1
-
 
                 if event.key == game.key_binds["right"]:
 
@@ -92,7 +90,6 @@ while running:
                     if game.movable_blocks.can_move(1, 0):
                         game.movable_blocks.move(1, 0)
 
-
                 elif event.key == game.key_binds["left"]:
 
                     # checks if the shape can move left
@@ -101,7 +98,6 @@ while running:
                     # if it can move left, then it moves left
                     if game.movable_blocks.can_move(-1, 0):
                         game.movable_blocks.move(-1, 0)
-
 
                 if event.key == game.key_binds["speed up"]:
                     game.movable_blocks.speed = 3*game.base_speed
@@ -141,7 +137,6 @@ while running:
                     # saving the key binds
                     for nkey in game.key_binds.keys():
                         config.data["key_binds"][nkey] = settings.get_key_movement(nkey)
-
 
                     screen.fill(config.data["bg_color"])
 
