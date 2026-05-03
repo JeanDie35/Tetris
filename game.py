@@ -1,120 +1,134 @@
 import numpy as np
 import random
-from config import *
 import pygame
 
 pygame.init()
 
 BlockSize = 25
-config = Config()
 
 # dic stores all the arrays for each type of block, with the rotated ones too
 blocks = {
-    2: [np.array([[0, 1, 0], [1, 1, 0], [0, 1, 0]]), np.array([[0, 0, 0], [1, 1, 1], [0, 1, 0]]),
-        np.array([[0, 1, 0], [0, 1, 1], [0, 1, 0]]), np.array([[0, 1, 0], [1, 1, 1], [0, 0, 0]])],
-    3: [np.array([[1, 0, 0], [1, 1, 0], [0, 1, 0]]), np.array([[0, 0, 0], [0, 1, 1], [1, 1, 0]]),
-        np.array([[0, 1, 0], [0, 1, 1], [0, 0, 1]]), np.array([[0, 1, 1], [1, 1, 0]])],
-    4: [np.array([[0, 1, 0], [0, 1, 0], [1, 1, 0]]), np.array([[0, 0, 0], [1, 1, 1], [0, 0, 1]]),
-        np.array([[0, 1, 1], [0, 1, 0], [0, 1, 0]]), np.array([[1, 0, 0], [1, 1, 1]])],
-    5: [np.array([[1, 1, 0], [0, 1, 0], [0, 1, 0]]), np.array([[0, 0, 0], [1, 1, 1], [1, 0, 0]]),
-        np.array([[0, 1, 0], [0, 1, 0], [0, 1, 1]]), np.array([[0, 0, 1], [1, 1, 1]])],
-    6: [np.array([[0, 1], [0, 1], [0, 1], [0, 1]]), np.array([[0, 0, 0, 0], [0, 0, 0, 0], [1, 1, 1, 1]]),
-        np.array([[0, 0, 1], [0, 0, 1], [0, 0, 1], [0, 0, 1]]), np.array([[0, 0, 0, 0], [1, 1, 1, 1]])],
-    7: [np.array([[1, 1], [1, 1]]), np.array([[1, 1], [1, 1]]), np.array([[1, 1], [1, 1]]),
-        np.array([[1, 1], [1, 1]])],
-    8: [np.array([[0, 1, 0], [1, 1, 0], [1, 0, 0]]), np.array([[0, 0, 0], [1, 1, 0], [0, 1, 1]]),
-        np.array([[0, 0, 1], [0, 1, 1], [0, 1, 0]]), np.array([[1, 1, 0], [0, 1, 1]])]
+    2: {
+        "arrays": [np.array([[0, 1, 0], [1, 1, 0], [0, 1, 0]]), np.array([[0, 0, 0], [1, 1, 1], [0, 1, 0]]),
+                   np.array([[0, 1, 0], [0, 1, 1], [0, 1, 0]]), np.array([[0, 1, 0], [1, 1, 1], [0, 0, 0]])],
+        "image": pygame.transform.scale(pygame.image.load("assets/blocks/blue_block.png"), (BlockSize, BlockSize))},
+    3: {
+        "arrays": [np.array([[1, 0, 0], [1, 1, 0], [0, 1, 0]]), np.array([[0, 0, 0], [0, 1, 1], [1, 1, 0]]),
+                   np.array([[0, 1, 0], [0, 1, 1], [0, 0, 1]]), np.array([[0, 1, 1], [1, 1, 0]])],
+        "image": pygame.transform.scale(pygame.image.load("assets/blocks/cyan_block.png"), (BlockSize, BlockSize))
+    },
+    4: {
+        "arrays": [np.array([[0, 1, 0], [0, 1, 0], [1, 1, 0]]), np.array([[0, 0, 0], [1, 1, 1], [0, 0, 1]]),
+                   np.array([[0, 1, 1], [0, 1, 0], [0, 1, 0]]), np.array([[1, 0, 0], [1, 1, 1]])],
+        "image": pygame.transform.scale(pygame.image.load("assets/blocks/green_block.png"), (BlockSize, BlockSize))
+    },
+    5: {
+        "arrays": [np.array([[1, 1, 0], [0, 1, 0], [0, 1, 0]]), np.array([[0, 0, 0], [1, 1, 1], [1, 0, 0]]),
+                   np.array([[0, 1, 0], [0, 1, 0], [0, 1, 1]]), np.array([[0, 0, 1], [1, 1, 1]])],
+        "image": pygame.transform.scale(pygame.image.load("assets/blocks/pink_block.png"), (BlockSize, BlockSize))
+    },
+    6: {
+        "arrays": [np.array([[0, 1], [0, 1], [0, 1], [0, 1]]), np.array([[0, 0, 0, 0], [0, 0, 0, 0], [1, 1, 1, 1]]),
+                   np.array([[0, 0, 1], [0, 0, 1], [0, 0, 1], [0, 0, 1]]), np.array([[0, 0, 0, 0], [1, 1, 1, 1]])],
+        "image": pygame.transform.scale(pygame.image.load("assets/blocks/purple_block.png"), (BlockSize, BlockSize))
+    },
+    7: {
+        "arrays": [np.array([[1, 1], [1, 1]]), np.array([[1, 1], [1, 1]]), np.array([[1, 1], [1, 1]]),
+                  np.array([[1, 1], [1, 1]])],
+        "image": pygame.transform.scale(pygame.image.load("assets/blocks/red_block.png"), (BlockSize, BlockSize))
+    },
+    8: {
+        "arrays": [np.array([[0, 1, 0], [1, 1, 0], [1, 0, 0]]), np.array([[0, 0, 0], [1, 1, 0], [0, 1, 1]]),
+                  np.array([[0, 0, 1], [0, 1, 1], [0, 1, 0]]), np.array([[1, 1, 0], [0, 1, 1]])],
+        "image": pygame.transform.scale(pygame.image.load("assets/blocks/yellow_block.png"), (BlockSize, BlockSize))
+    }
 }
 
-blocks_image = {
-    2: pygame.transform.scale(pygame.image.load("assets/blocks/blue_block.png"), (BlockSize, BlockSize)),
-    3: pygame.transform.scale(pygame.image.load("assets/blocks/cyan_block.png"), (BlockSize, BlockSize)),
-    4: pygame.transform.scale(pygame.image.load("assets/blocks/green_block.png"), (BlockSize, BlockSize)),
-    5: pygame.transform.scale(pygame.image.load("assets/blocks/pink_block.png"), (BlockSize, BlockSize)),
-    6: pygame.transform.scale(pygame.image.load("assets/blocks/purple_block.png"), (BlockSize, BlockSize)),
-    7: pygame.transform.scale(pygame.image.load("assets/blocks/red_block.png"), (BlockSize, BlockSize)),
-    8: pygame.transform.scale(pygame.image.load("assets/blocks/yellow_block.png"), (BlockSize, BlockSize)),
-}
 
+class ActivePiece:
 
-class MovableBlocks:
-
-    def __init__(self, game, color=None):
+    def __init__(self, game, config, color=None):
         if color is None:
             self.color_value = random.choice(list(blocks.keys()))
         else:
             self.color_value = color
 
+        self.config = config
         self.speed = 1
         self.state = 0
-        self.array = blocks[self.color_value][self.state]
+        self.array = blocks[self.color_value]["arrays"][self.state]
         self.game = game
-        # we get the coordinates of each block of the movable_blocks
-        self.co = self.get_co(self.game.a, True)
+        # we get the coordinates of each block of the active_piece
+        self.coords = self.get_coords(self.game.grid, True)
         # stores the actual positon of the array, so when it turns, it doesn't move right
         self.pos = [0, self.game.playing_screen_size[0] // 2 // BlockSize]
 
-    def get_co(self, array: np.array, reverse: bool) -> list:
+    def get_coords(self, array: np.array, reverse: bool) -> list:
         """""
-        returns the coordinates of every ones in a
+        returns the coordinates of every ones in grid
         """""
         coords = np.argwhere(array == 1)
-        # we sort the list with the biggest co in the first place so when we make
+        # we sort the list with the biggest coords in the first place so when we make
         # the blocks go down 1 block they don't destroy each other
-        # you must reverse it or not depending on where the block will move, to understand this better make a scheme
+        # you must reverse it or not depending on where the block will move, to understand this better make grid scheme
         return sorted(map(list, coords), reverse=reverse)
+
+    def get_next_right_state(self) -> int:
+        state = self.state
+        state += 1
+        if state >= 4:
+            state = 0
+        return state
 
     def simulate_right_turn(self) -> np.array:
         """""
-        returns a turned array
+        returns grid turned array
         """""
-        self.state += 1
-        if self.state >= 4:
-            self.state = 0
-        return blocks[self.color_value][self.state]
+        return blocks[self.color_value]["arrays"][self.get_next_right_state()]
+
+    def get_next_left_state(self) -> int:
+        state = self.state
+        state -= 1
+        if state <= -1:
+            state = 3
+        return state
 
     def simulate_left_turn(self) -> np.array:
         """""
-        returns a turned array
+        returns grid turned array
         """""
-        self.state -= 1
-        if self.state <= -1:
-            self.state = 3
-        return blocks[self.color_value][self.state]
+        return blocks[self.color_value]["arrays"][self.get_next_left_state()]
 
     def move(self, dx: int, dy: int):
         self.pos[0] += dy
         self.pos[1] += dx
-        for coords in self.co:
+        for coords in self.coords:
             # hiding the old block
-            self.game.a[coords[0], coords[1]] = 0
-            self.game.a[coords[0] + dy, coords[1] + dx] = 1
+            self.game.grid[coords[0], coords[1]] = 0
+            self.game.grid[coords[0] + dy, coords[1] + dx] = 1
 
     def can_move(self, dx: int, dy: int) -> bool:
         """""
-        checks if the blocks can move in a direction
+        checks if the blocks can move in grid direction
         """""
         movable = True
-        for coords in self.co:
-            if self.game.a[coords[0] + dy, coords[1] + dx] in range(config.data["first_fixed_block"],
-                                                                    config.data["last_fixed_block"] + 1) or not (
-                    0 <= coords[0] + dy < self.game.a.shape[0]) or not (0 <= coords[1] + dx < self.game.a.shape[1]):
+        for coords in self.coords:
+            if not (0 <= coords[0] + dy < self.game.grid.shape[0]) or not (0 <= coords[1] + dx < self.game.grid.shape[1]) or self.game.is_fixed_block((coords[0] + dy, coords[1] + dx)):
                 movable = False
                 break
         return movable
 
-    def can_fit(self, arr: np.array) -> bool:
+    def can_fit(self, piece_array: np.array) -> bool:
         """""
         checks if the array can fit at the moving blocks position
         """""
         fit = True
-        arr_co = self.get_co(arr, False)
+        arr_co = self.get_coords(piece_array, False)
         for coords in arr_co:
 
-            if (self.game.a[coords[0] + self.pos[0], coords[1] + self.pos[1]]
-                    in range(config.data["first_fixed_block"], config.data["last_fixed_block"] + 1)
-                    or not (0 <= coords[0] + self.pos[0] < self.game.a.shape[0]) or not (
-                            0 <= coords[1] + self.pos[1] < self.game.a.shape[1])):
+            if (not (0 <= coords[0] + self.pos[0] < self.game.grid.shape[0])
+                    or not (0 <= coords[1] + self.pos[1] < self.game.grid.shape[1])
+                    or self.game.is_fixed_block((coords[0] + self.pos[0], coords[1] + self.pos[1]))):
                 fit = False
                 break
         return fit
@@ -122,41 +136,45 @@ class MovableBlocks:
 
 class Game:
 
-    def __init__(self, screen: pygame.surface.Surface):
+    def __init__(self, screen: pygame.surface.Surface, config):
         self.screen = screen
+        self.config = config
 
-        self.playing_screen_size = (config.data["playing_screen_width"], config.data["playing_screen_height"])
+        self.playing_screen_size = (self.config.data["playing_screen_width"], self.config.data["playing_screen_height"])
         # creating the numpy array
         self.arr_size = (self.playing_screen_size[1] // BlockSize, self.playing_screen_size[0] // BlockSize)
-        self.a = np.zeros(self.arr_size)
+        self.grid = np.zeros(self.arr_size)
 
-        self.movable_blocks = MovableBlocks(game=self)
+        self.active_piece = ActivePiece(self, self.config)
         self.insert_blocks()
 
         self.next_color = random.choice(list(blocks.keys()))
         self.line_broken = 0
         self.score = 0
         # var stores the normal speed, when k up isn't pressed
-        self.base_speed = config.data["base_speed"]
+        self.base_speed = self.config.data["base_speed"]
 
         self.over = False
 
-        self.font = pygame.font.SysFont(config.data["font_name"], config.data["font_size"])
+        self.font = pygame.font.SysFont(self.config.data["font_name"], self.config.data["font_size"])
         self.counter = 0
 
-        self.key_binds = config.data["key_binds"]
+        self.key_binds = self.config.data["key_binds"]
 
     def insert_blocks(self):
         """""
         insert the moving blocks at the top of the screen
         """""
-        y = self.movable_blocks.pos[0] + self.movable_blocks.array.shape[0]
-        x = self.movable_blocks.pos[1] + self.movable_blocks.array.shape[1]
-        # if there's a put block where the blocks must generate
-        for color_value in range(config.data["first_fixed_block"], config.data["last_fixed_block"] + 1):
-            if color_value in self.a[self.movable_blocks.pos[0]:y, self.movable_blocks.pos[1]:x]:
+        y = self.active_piece.pos[0] + self.active_piece.array.shape[0]
+        x = self.active_piece.pos[1] + self.active_piece.array.shape[1]
+        # if there's grid put block where the blocks must generate
+        for color_value in range(self.config.data["first_fixed_block"], self.config.data["last_fixed_block"] + 1):
+            if color_value in self.grid[self.active_piece.pos[0]:y, self.active_piece.pos[1]:x]:
                 self.over = True
-        self.a[self.movable_blocks.pos[0]:y, self.movable_blocks.pos[1]:x] = self.movable_blocks.array
+        self.grid[self.active_piece.pos[0]:y, self.active_piece.pos[1]:x] = self.active_piece.array
+
+    def is_fixed_block(self, coords: list|tuple) -> bool:
+        return self.config.data["first_fixed_block"] <= self.grid[coords] <= self.config.data["last_fixed_block"]
 
     def reset(self):
         """""
@@ -168,9 +186,9 @@ class Game:
         self.over = False
         # creating the numpy array
         self.arr_size = (self.playing_screen_size[1] // BlockSize, self.playing_screen_size[0] // BlockSize)
-        self.a = np.zeros(self.arr_size)
+        self.grid = np.zeros(self.arr_size)
 
-        self.movable_blocks = MovableBlocks(game=self)
+        self.active_piece = ActivePiece(self, self.config)
         self.insert_blocks()
 
     def move_line_down(self, y: int):
@@ -180,58 +198,60 @@ class Game:
         # move all the line higher than y by one block
         for i in range(y + 1):
             if y - i != 0:
-                self.a[y - i, :] = self.a[y - i - 1, :]
+                self.grid[y - i, :] = self.grid[y - i - 1, :]
             else:
-                self.a[y - i, :] = config.data["empty"]
+                self.grid[y - i, :] = self.config.data["empty"]
 
     def update_next_block(self):
-        next_array = blocks[self.next_color][0]
+        next_array = blocks[self.next_color]["arrays"][0]
 
         for y in range(next_array.shape[0]):
             for x in range(next_array.shape[1]):
-                if next_array[y, x] == config.data["moving_block"]:
-                    self.screen.blit(blocks_image[self.next_color], (
-                        self.playing_screen_size[0] + config.data["sidebar_offset"] + x * BlockSize, 70 + y * BlockSize,
+                if next_array[y, x] == self.config.data["moving_block"]:
+                    self.screen.blit(blocks[self.next_color]["image"], (
+                        self.playing_screen_size[0] + self.config.data["sidebar_offset"] + x * BlockSize,
+                        70 + y * BlockSize,
                         BlockSize, BlockSize))
 
     def update_score(self):
-        score_text = self.font.render(f"Score : {self.score}", 1, config.data["colors"]["white"])
-        self.screen.blit(score_text, (self.playing_screen_size[0] + config.data["sidebar_offset"], 200))
+        score_text = self.font.render(f"Score : {self.score}", 1, self.config.data["colors"]["white"])
+        self.screen.blit(score_text, (self.playing_screen_size[0] + self.config.data["sidebar_offset"], 200))
 
     def update_texts(self):
-        blocks_text = self.font.render("Next block:", 1, config.data["colors"]["white"])
-        self.screen.blit(blocks_text, (self.playing_screen_size[0] + config.data["sidebar_offset"], 20))
+        blocks_text = self.font.render("Next block:", 1, self.config.data["colors"]["white"])
+        self.screen.blit(blocks_text, (self.playing_screen_size[0] + self.config.data["sidebar_offset"], 20))
 
     def update_displays(self):
         """""
         update the displays on the right side of the screen
         """""
-        pygame.draw.rect(self.screen, config.data["colors"]["black"], (
-            (self.playing_screen_size[0] + config.data["sidebar_offset"], 0),
+        pygame.draw.rect(self.screen, self.config.data["colors"]["black"], (
+            (self.playing_screen_size[0] + self.config.data["sidebar_offset"], 0),
             (self.screen.get_width() - self.playing_screen_size[0], self.screen.get_height())))
 
         self.update_score()
         self.update_texts()
         self.update_next_block()
         # creating the right part of the screen
-        pygame.draw.rect(self.screen, config.data["colors"]["blue"],
+        pygame.draw.rect(self.screen, self.config.data["colors"]["blue"],
                          ((self.playing_screen_size[0], 0), (10, self.screen.get_height())))
 
     def update_blocks(self):
         # updating the blocks
-        non_zero = np.argwhere(self.a != 0)
+        self.screen.fill(self.config.data["bg_color"])
+        non_zero = np.argwhere(self.grid != 0)
         for y, x in non_zero:
-            if self.a[y, x] in range(config.data["first_fixed_block"], config.data["last_fixed_block"] + 1):
-                self.screen.blit(blocks_image[int(self.a[y, x])],
+            if self.is_fixed_block((y, x)):
+                self.screen.blit(blocks[int(self.grid[y, x])]["image"],
                                  (x * BlockSize, y * BlockSize, BlockSize, BlockSize))
             else:
-                self.screen.blit(blocks_image[self.movable_blocks.color_value],
+                self.screen.blit(blocks[self.active_piece.color_value]["image"],
                                  (x * BlockSize, y * BlockSize, BlockSize, BlockSize))
 
     def check_lines(self):
-        # checks if a line of a is only made of 2s, if so we move all the lines higher than this line down
-        for i in range(self.a.shape[0]):
-            if not config.data["empty"] in self.a[i, :] and not config.data["moving_block"] in self.a[i, :]:
+        # checks if grid line of grid is only made of 2s, if so we move all the lines higher than this line down
+        for i in range(self.grid.shape[0]):
+            if not self.config.data["empty"] in self.grid[i, :] and not self.config.data["moving_block"] in self.grid[i, :]:
                 self.line_broken += 1
                 self.move_line_down(i)
                 if self.line_broken % 10 == 0:
@@ -241,28 +261,28 @@ class Game:
         """""
         makes the moving blocks fall
         """""
-        if self.counter % int(15 / self.movable_blocks.speed) == 0:
+        if self.counter % int(15 / self.active_piece.speed) == 0:
 
-            # getting the co of the blocks before moving them
-            self.movable_blocks.co = self.movable_blocks.get_co(self.a, True)
+            # getting the coords of the blocks before moving them
+            self.active_piece.coords = self.active_piece.get_coords(self.grid, True)
 
             # if the block can move down then it moves down
-            if not self.movable_blocks.can_move(0, 1):
-                self.movable_blocks.move(0, 1)
+            if self.active_piece.can_move(0, 1):
+                self.active_piece.move(0, 1)
             else:
-
+                self.spawn_new_blocks()
                 # if the game is over, we don't add the points
                 if not self.over:
-                    self.score += config.data["score_per_block"]
-                    self.spawn_new_blocks()
+                    self.score += self.config.data["score_per_block"]
 
     def spawn_new_blocks(self):
-        for co in self.movable_blocks.co:
+        for co in self.active_piece.coords:
             # creating the put blocks with the blocks color
-            self.a[co[0], co[1]] = self.movable_blocks.color_value
+            self.grid[co[0], co[1]] = self.active_piece.color_value
 
         # else, we create new blocks
-        self.movable_blocks = MovableBlocks(self, self.next_color)
+        self.active_piece = ActivePiece(self, self.config, self.next_color)
+
         self.insert_blocks()
         self.next_color = random.choice(list(blocks.keys()))
 

@@ -15,10 +15,10 @@ FPS = config.data["FPS"]
 """""
 Careful:
  I used numpy to store the position of every block. Although, axis 1 in numpy arrays is the y axis, axis 2 is the x axis
- The numpy array that stores the position of the blocks is called a, there can be 3 different values:
+ The numpy array that stores the position of the blocks is called grid, there can be 3 different values:
     0 is when there's no block
     1 is for the blocks that you can move
-    2-8 is for the blocks that you can't move anymore, the number depends on the color
+    2-8 is for the bdlocks that you can't move anymore, the number depends on the color
 """""
 
 
@@ -28,10 +28,10 @@ pygame.display.set_caption(config.data["title"])
 screen_size = (config.data["screen_width"], config.data["screen_height"])
 screen = pygame.display.set_mode(screen_size)
 
-welcome = Welcome(screen)
-game = Game(screen)
-settings = Settings(screen, game)
-game_over = GameOver(screen)
+welcome = Welcome(screen, config)
+game = Game(screen, config)
+settings = Settings(screen, config)
+game_over = GameOver(screen, config)
 
 active_frame = welcome
 
@@ -59,53 +59,59 @@ while running:
 
                 if event.key == game.key_binds["turn right"] or event.key == game.key_binds["turn left"]:
 
-                    # getting the actual co of the blocks
-                    game.movable_blocks.co = game.movable_blocks.get_co(game.a, False)
+                    # getting the actual coords of the blocks
+                    game.active_piece.coords = game.active_piece.get_coords(game.grid, False)
 
                     if event.key == game.key_binds["turn right"]:
-                        turned_array = game.movable_blocks.simulate_right_turn()
+                        turned_array = game.active_piece.simulate_right_turn()
+                        next_state = game.active_piece.get_next_right_state()
 
                     elif event.key == game.key_binds["turn left"]:
-                        turned_array = game.movable_blocks.simulate_left_turn()
+                        turned_array = game.active_piece.simulate_left_turn()
+                        next_state = game.active_piece.get_next_left_state()
 
                     # if it can turn
-                    if game.movable_blocks.can_fit(turned_array):
-                        for y, x in game.movable_blocks.co:
-                            game.a[y, x] = 0
+                    if game.active_piece.can_fit(turned_array):
+                        # hiding old blocks
+                        for y, x in game.active_piece.coords:
+                            game.grid[y, x] = 0
 
                         # updating the array
-                        game.movable_blocks.array = turned_array
-                        # updating co
-                        game.movable_blocks.co = game.movable_blocks.get_co(game.a, False)
+                        game.active_piece.array = turned_array
+                        game.active_piece.state = next_state
 
-                        for y, x in game.movable_blocks.co:
-                            game.a[y, x] = 1
+                        game.insert_blocks()
+                        # updating coords
+                        game.active_piece.coords = game.active_piece.get_coords(game.grid, False)
+
+                        for y, x in game.active_piece.coords:
+                            game.grid[y, x] = 1
 
                 if event.key == game.key_binds["right"]:
 
-                    # updating the co before moving
-                    game.movable_blocks.co = game.movable_blocks.get_co(game.a, True)
+                    # updating the coords before moving
+                    game.active_piece.coords = game.active_piece.get_coords(game.grid, True)
 
                     # if it can move right, then it moves right
-                    if game.movable_blocks.can_move(1, 0):
-                        game.movable_blocks.move(1, 0)
+                    if game.active_piece.can_move(1, 0):
+                        game.active_piece.move(1, 0)
 
                 elif event.key == game.key_binds["left"]:
 
                     # checks if the shape can move left
-                    game.movable_blocks.co = game.movable_blocks.get_co(game.a, False)
+                    game.active_piece.coords = game.active_piece.get_coords(game.grid, False)
 
                     # if it can move left, then it moves left
-                    if game.movable_blocks.can_move(-1, 0):
-                        game.movable_blocks.move(-1, 0)
+                    if game.active_piece.can_move(-1, 0):
+                        game.active_piece.move(-1, 0)
 
                 if event.key == game.key_binds["speed up"]:
-                    game.movable_blocks.speed = 3*game.base_speed
+                    game.active_piece.speed = 3 * game.base_speed
 
             elif active_frame == settings:
 
                 for k_selector in settings.key_selectors.items():
-                    # if a key selector is selected, its key will be the pressed one
+                    # if grid key selector is selected, its key will be the pressed one
                     if k_selector[1].selected:
                         k_selector[1].change_key(event.key)
 
@@ -113,7 +119,7 @@ while running:
 
             if active_frame == game:
                 if event.key == game.key_binds["speed up"]:
-                    game.movable_blocks.speed = game.base_speed
+                    game.active_piece.speed = game.base_speed
 
         elif event.type == pygame.MOUSEBUTTONDOWN:
 
@@ -140,7 +146,7 @@ while running:
 
                     screen.fill(config.data["bg_color"])
 
-                # if the user clicks on a key selector, it becomes selected
+                # if the user clicks on grid key selector, it becomes selected
                 for k_selector in settings.key_selectors.items():
                     if k_selector[1].rect.collidepoint(event.pos):
                         k_selector[1].selected = True
