@@ -64,67 +64,47 @@ while running:
                     game.movable_blocks.co = game.movable_blocks.get_co(game.a, False)
 
                     if event.key == game.key_binds["turn right"]:
-                        game.movable_blocks.turn_right()
+                        simulate_arr = game.movable_blocks.simulate_right_turn()
 
                     elif event.key == game.key_binds["turn left"]:
-                        game.movable_blocks.turn_left()
+                        simulate_arr = game.movable_blocks.simulate_left_turn()
 
+                    # if it can turn
+                    if game.movable_blocks.can_fit(simulate_arr):
+                        for y, x in game.movable_blocks.co:
+                            game.a[y, x] = 0
 
-                    game.movable_blocks.update_array()
-                    # getting the new co of the blocks, after turning
-                    new_co = game.movable_blocks.get_co(game.movable_blocks.array, False)
+                        # updating the array
+                        game.movable_blocks.array = simulate_arr
+                        # updating co
+                        game.movable_blocks.co = game.movable_blocks.get_co(game.a, False)
 
-                    for i in range(len(new_co)):
-                        # calculates the co  of the new blocks on the main array a
-                        new_co[i] = (new_co[i][0] + game.movable_blocks.pos[0], new_co[i][1] + game.movable_blocks.pos[1])
-                        # checks if the blocks can turn without hitting put blocks or going out of the screen
-                        if 0 > new_co[i][0] or new_co[i][0] >= game.playing_screen_size[1] // BlockSize or 0 > new_co[i][1] or new_co[i][1] >= game.playing_screen_size[0] // BlockSize or game.a[new_co[i]] in range(2, 9):
-                            game.movable_blocks.movable = False
+                        for y, x in game.movable_blocks.co:
+                            game.a[y, x] = 1
 
-                    if game.movable_blocks.movable:
-                        # hide the old blocks
-                        for n in game.movable_blocks.co:
-                            game.a[n] = 0
-                        for i in range(len(new_co)):
-                            game.a[new_co[i]] = 1
-                    game.movable_blocks.movable = True
 
                 if event.key == game.key_binds["right"]:
 
-                    # checking if the shape can move right
+                    # updating the co before moving
                     game.movable_blocks.co = game.movable_blocks.get_co(game.a, True)
 
-                    for i in range(len(game.movable_blocks.co)):
-                        # checks if the block on the right is not a put block or the end of the screen
-                        if game.movable_blocks.co[i][1] + 1 >= game.playing_screen_size[0] // BlockSize or game.a[game.movable_blocks.co[i][0], game.movable_blocks.co[i][1] + 1] in range(2, 9):
-                            game.movable_blocks.movable = False
-                            break
-
                     # if it can move right, then it moves right
-                    if game.movable_blocks.movable:
-                        game.movable_blocks.move_right()
+                    if game.movable_blocks.can_move(1, 0):
+                        game.movable_blocks.move(1, 0)
 
-                    game.movable_blocks.movable = True
 
                 elif event.key == game.key_binds["left"]:
 
                     # checks if the shape can move left
                     game.movable_blocks.co = game.movable_blocks.get_co(game.a, False)
 
-                    for i in range(len(game.movable_blocks.co)):
-                        # checks if the block on the right is not a put block or the end of the screen
-                        if game.movable_blocks.co[i][1] - 1 == -1 or game.a[game.movable_blocks.co[i][0], game.movable_blocks.co[i][1] - 1] in range(2, 9):
-                            game.movable_blocks.movable = False
-                            break
-
                     # if it can move left, then it moves left
-                    if game.movable_blocks.movable:
-                        game.movable_blocks.move_left()
+                    if game.movable_blocks.can_move(-1, 0):
+                        game.movable_blocks.move(-1, 0)
 
-                    game.movable_blocks.movable = True
 
                 if event.key == game.key_binds["speed up"]:
-                    game.movable_blocks.speed = 3*game.normal_speed
+                    game.movable_blocks.speed = 3*game.base_speed
 
             elif active_frame == settings:
 
@@ -137,7 +117,7 @@ while running:
 
             if active_frame == game:
                 if event.key == game.key_binds["speed up"]:
-                    game.movable_blocks.speed = game.normal_speed
+                    game.movable_blocks.speed = game.base_speed
 
         elif event.type == pygame.MOUSEBUTTONDOWN:
 

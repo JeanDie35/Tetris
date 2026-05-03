@@ -1,5 +1,6 @@
 import pygame
 pygame.init()
+from config import *
 
 # all the keys that can't work with chr() or ord() function but we still want to be able to bind them
 special_keys = {
@@ -9,13 +10,14 @@ special_keys = {
     pygame.K_DOWN: "down arrow"
 }
 
+config = Config()
+
 # parent class for all the different frames there's
 class Frame:
 
-    def __init__(self, screen, config):
+    def __init__(self, screen):
         self.screen = screen
-        self.config = config
-        self.font = pygame.font.SysFont(self.config.data["font_name"], self.config.data["font_size"])
+        self.font = pygame.font.SysFont(config.data["font_name"], config.data["font_size"])
 
     def update(self):
         pass
@@ -24,9 +26,9 @@ class Frame:
 # thr frame that will be displayed when you launch the app
 class Welcome(Frame):
 
-    def __init__(self, screen, config):
+    def __init__(self, screen):
 
-        super().__init__(screen, config)
+        super().__init__(screen)
         # the images that will be displayed on this frame
         self.assets = {
             "logo" : pygame.image.load("assets/logo.png"),
@@ -51,8 +53,8 @@ class Welcome(Frame):
 # the frame where you can change the key binds
 class Settings(Frame):
 
-    def __init__(self, screen, config, game):
-        super().__init__(screen, config)
+    def __init__(self, screen, game):
+        super().__init__(screen)
 
         self.game = game
         self.assets = {
@@ -64,11 +66,11 @@ class Settings(Frame):
 
         # creating a dict to store all the key selectors depending on what key are they bound to
         self.key_selectors = {
-        "right": KeySelector(self.screen, self.config.data["key_binds"]["right"], 65, self.config),
-        "left": KeySelector(self.screen, self.config.data["key_binds"]["left"], 155, self.config),
-        "turn right": KeySelector(self.screen, self.config.data["key_binds"]["turn right"], 245, self.config),
-        "turn left": KeySelector(self.screen, self.config.data["key_binds"]["turn left"], 335, self.config),
-        "speed up": KeySelector(self.screen, self.config.data["key_binds"]["speed up"], 425, self.config)
+        "right": KeySelector(self.screen, config.data["key_binds"]["right"], 65),
+        "left": KeySelector(self.screen, config.data["key_binds"]["left"], 155),
+        "turn right": KeySelector(self.screen, config.data["key_binds"]["turn right"], 245),
+        "turn left": KeySelector(self.screen, config.data["key_binds"]["turn left"], 335),
+        "speed up": KeySelector(self.screen, config.data["key_binds"]["speed up"], 425)
         }
 
 
@@ -79,7 +81,7 @@ class Settings(Frame):
         # for each key selector
         for i in range(len(list(self.key_selectors.keys()))):
             # we display a text saying what movement is the key selector bound to
-            key_text = self.font.render(list(self.key_selectors.keys())[i], 1, [255, 255, 255])
+            key_text = self.font.render(list(self.key_selectors.keys())[i], 1, config.data["colors"]["white"])
             self.screen.blit(key_text, (self.screen.get_width() // 2 - key_text.get_width() // 2, 20 + i * 90))
 
             # displays the key selctor
@@ -92,8 +94,8 @@ class Settings(Frame):
 class GameOver(Frame):
 
 
-    def __init__(self, screen, config):
-        super().__init__(screen, config)
+    def __init__(self, screen):
+        super().__init__(screen)
         self.score = 0
 
         self.assets = {
@@ -105,16 +107,16 @@ class GameOver(Frame):
         self.back_rect.x, self.back_rect.y = (0 + self.back_rect.width // 2, self.screen.get_height() - self.back_rect.height - 20)
 
 
-        self.best_score = self.config.data["best_score"]
+        self.best_score = config.data["best_score"]
 
     def update(self):
         # displays the elements of the frame
         self.best_score = max(self.best_score, self.score)
-        best_score_text = self.font.render(f"Best score : {self.best_score}", 1, (255, 255, 255))
+        best_score_text = self.font.render(f"Best score : {self.best_score}", 1, config.data["colors"]["white"])
         self.screen.blit(best_score_text, (self.screen.get_width() // 2 - best_score_text.get_width() // 2,
                                       self.screen.get_height() // 2 - best_score_text.get_height() // 2))
 
-        score_text = self.font.render(f"Your score : {self.score}", 1, (255, 255, 255))
+        score_text = self.font.render(f"Your score : {self.score}", 1, config.data["colors"]["white"])
         self.screen.blit(score_text, (self.screen.get_width() // 2 - score_text.get_width() // 2,
                                       3 * self.screen.get_height() // 4 - score_text.get_height() // 2))
 
@@ -123,15 +125,11 @@ class GameOver(Frame):
         self.screen.blit(self.assets["victory"], (self.screen.get_width() // 2 - self.assets["victory"].get_width() // 2,
                                       self.screen.get_height() // 4 - self.assets["victory"].get_height() // 4))
 
-    def save_best_score(self):
-        file = open("best_score.txt", "w")
-        file.write(str(self.best_score))
-        file.close()
 
 
 class KeySelector:
 
-    def __init__(self, screen, nkey, y, config):
+    def __init__(self, screen, nkey, y):
         self.screen = screen
         self.font = pygame.font.SysFont(config.data["font_name"], config.data["font_size"])
 
@@ -143,9 +141,9 @@ class KeySelector:
 
     def display(self):
 
-        pygame.draw.rect(self.screen, [200, 200, 200], self.rect)
+        pygame.draw.rect(self.screen, config.data["colors"]["grey"], self.rect)
 
-        key_text = self.font.render(self.get_key(self.nkey), 1, [255, 255, 255])
+        key_text = self.font.render(self.get_key(self.nkey), 1, config.data["colors"]["white"])
         self.screen.blit(key_text, (self.rect.x + self.rect.w // 2 - key_text.get_width() // 2, self.rect.y + self.rect.h // 2 - key_text.get_height() // 2))
 
 
@@ -160,7 +158,10 @@ class KeySelector:
 
 
     def get_key(self, nkey):
-        if nkey in special_keys.keys():
+        if nkey in special_keys:
             return special_keys[nkey]
         else:
-            return chr(nkey)
+            try:
+                return chr(nkey)
+            except ValueError:
+                print("You can't use this key, please enter anonther one")
