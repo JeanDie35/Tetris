@@ -9,6 +9,15 @@ special_keys = {
     pygame.K_DOWN: "down arrow"
 }
 
+assets = {
+        "logo": pygame.image.load("assets/logo.png"),
+        "play": pygame.image.load("assets/play_button.png"),
+        "settings": pygame.image.load("assets/settings_button.png"),
+        "back": pygame.image.load("assets/back_button.png"),
+        "victory": pygame.image.load("assets/victory.png")
+
+}
+
 
 # parent class for all the different frames there's
 class Frame:
@@ -22,32 +31,27 @@ class Frame:
         pass
 
 
+
 # thr frame that will be displayed when you launch the app
 class Welcome(Frame):
 
     def __init__(self, screen: pygame.surface.Surface, config):
         super().__init__(screen, config)
-        # the images that will be displayed on this frame
-        self.assets = {
-            "logo": pygame.image.load("assets/logo.png"),
-            "play": pygame.image.load("assets/play_button.png"),
-            "settings": pygame.image.load("assets/settings_button.png"),
-        }
         # creating grid var for the buttons' rect because it'll be needed when cheking if the mouse is on the button
-        self.play_rect = self.assets["play"].get_rect()
-        self.play_rect.x, self.play_rect.y = (self.screen.get_width() // 2 - self.assets["play"].get_width() // 2,
-                                              3 * self.screen.get_height() // 4 - self.assets["play"].get_width() // 4)
+        self.play_rect = assets["play"].get_rect()
+        self.play_rect.x, self.play_rect.y = (self.screen.get_width() // 2 - assets["play"].get_width() // 2,
+                                              3 * self.screen.get_height() // 4 - assets["play"].get_width() // 4)
 
-        self.settings_rect = self.assets["settings"].get_rect()
+        self.settings_rect = assets["settings"].get_rect()
         self.settings_rect.x, self.settings_rect.y = (0, 0)
 
     def update(self):
-        self.screen.blit(self.assets["logo"], (self.screen.get_width() // 2 - self.assets["logo"].get_width() // 2,
-                                               self.screen.get_height() // 4 - self.assets["logo"].get_width() // 4))
+        self.screen.blit(assets["logo"], (self.screen.get_width() // 2 - assets["logo"].get_width() // 2,
+                                               self.screen.get_height() // 4 - assets["logo"].get_width() // 4))
 
-        self.screen.blit(self.assets["play"], self.play_rect)
+        self.screen.blit(assets["play"], self.play_rect)
 
-        self.screen.blit(self.assets["settings"], self.settings_rect)
+        self.screen.blit(assets["settings"], self.settings_rect)
 
 
 # the frame where you can change the key binds
@@ -56,11 +60,8 @@ class Settings(Frame):
     def __init__(self, screen: pygame.surface.Surface, config):
         super().__init__(screen, config)
 
-        self.assets = {
-            "back": pygame.image.load("assets/back_button.png"),
-        }
         # creating a var for the buttons' rect because it'll be needed when cheking if the mouse is on the button
-        self.back_rect = self.assets["back"].get_rect()
+        self.back_rect = assets["back"].get_rect()
         self.back_rect.x, self.back_rect.y = (0, 0)
 
         # creating a dict to store all the key selectors depending on what key are they bound to
@@ -73,7 +74,7 @@ class Settings(Frame):
         }
 
     def update(self):
-        self.screen.blit(self.assets["back"], self.back_rect)
+        self.screen.blit(assets["back"], self.back_rect)
 
         # for each key selector
         for i in range(len(list(self.key_selectors.keys()))):
@@ -82,7 +83,7 @@ class Settings(Frame):
             self.screen.blit(key_text, (self.screen.get_width() // 2 - key_text.get_width() // 2, 20 + i * 90))
 
             # displays the key selctor
-            self.key_selectors[list(self.key_selectors.keys())[i]].display()
+            self.key_selectors[list(self.key_selectors.keys())[i]].render()
 
     def get_key_movement(self, movement: str) -> int:
         """""
@@ -98,12 +99,8 @@ class GameOver(Frame):
         super().__init__(screen, config)
         self.score = 0
 
-        self.assets = {
-            "back": pygame.image.load("assets/back_button.png"),
-            "victory": pygame.image.load("assets/victory.png")
-        }
         # creating a var for the buttons' rect because it'll be needed when cheking if the mouse is on the button
-        self.back_rect = self.assets["back"].get_rect()
+        self.back_rect = assets["back"].get_rect()
         self.back_rect.x, self.back_rect.y = (0 + self.back_rect.width // 2,
                                               self.screen.get_height() - self.back_rect.height - 20)
 
@@ -111,6 +108,7 @@ class GameOver(Frame):
 
     def update(self):
         self.best_score = max(self.best_score, self.score)
+
         best_score_text = self.font.render(f"Best score : {self.best_score}", 1, self.config.data["colors"]["white"])
         self.screen.blit(best_score_text, (self.screen.get_width() // 2 - best_score_text.get_width() // 2,
                                            self.screen.get_height() // 2 - best_score_text.get_height() // 2))
@@ -119,11 +117,12 @@ class GameOver(Frame):
         self.screen.blit(score_text, (self.screen.get_width() // 2 - score_text.get_width() // 2,
                                       3 * self.screen.get_height() // 4 - score_text.get_height() // 2))
 
-        self.screen.blit(self.assets["back"], self.back_rect)
+        self.screen.blit(assets["back"], self.back_rect)
 
-        self.screen.blit(self.assets["victory"],
-                         (self.screen.get_width() // 2 - self.assets["victory"].get_width() // 2,
-                          self.screen.get_height() // 4 - self.assets["victory"].get_height() // 4))
+        self.screen.blit(assets["victory"],
+                         (self.screen.get_width() // 2 - assets["victory"].get_width() // 2,
+                          self.screen.get_height() // 4 - assets["victory"].get_height() // 4))
+
 
 
 class KeySelector:
@@ -139,7 +138,7 @@ class KeySelector:
         self.size = (200, 50)
         self.rect = pygame.rect.Rect((self.screen.get_width() // 2 - self.size[0] // 2, y), self.size)
 
-    def display(self):
+    def render(self):
         """""
         displays the key_selector at its position
         """""

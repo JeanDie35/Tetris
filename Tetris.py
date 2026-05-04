@@ -55,6 +55,7 @@ while running:
             running = False
 
         if event.type == pygame.KEYDOWN:
+
             if active_frame == game:
 
                 if event.key == game.key_binds["turn right"] or event.key == game.key_binds["turn left"]:
@@ -108,8 +109,8 @@ while running:
                 if event.key == game.key_binds["speed up"]:
                     game.active_piece.speed = 3 * game.base_speed
 
-            elif active_frame == settings:
 
+            elif active_frame == settings:
                 for k_selector in settings.key_selectors.items():
                     # if grid key selector is selected, its key will be the pressed one
                     if k_selector[1].selected:
@@ -117,9 +118,8 @@ while running:
 
         elif event.type == pygame.KEYUP:
 
-            if active_frame == game:
-                if event.key == game.key_binds["speed up"]:
-                    game.active_piece.speed = game.base_speed
+            if event.key == game.key_binds["speed up"]:
+                game.active_piece.speed = game.base_speed
 
         elif event.type == pygame.MOUSEBUTTONDOWN:
 
@@ -144,7 +144,7 @@ while running:
                     for nkey in game.key_binds.keys():
                         config.data["key_binds"][nkey] = settings.get_key_movement(nkey)
 
-                    screen.fill(config.data["bg_color"])
+                screen.fill(config.data["bg_color"])
 
                 # if the user clicks on grid key selector, it becomes selected
                 for k_selector in settings.key_selectors.items():

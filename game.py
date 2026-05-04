@@ -221,7 +221,7 @@ class Game:
         blocks_text = self.font.render("Next block:", 1, self.config.data["colors"]["white"])
         self.screen.blit(blocks_text, (self.playing_screen_size[0] + self.config.data["sidebar_offset"], 20))
 
-    def update_displays(self):
+    def render(self):
         """""
         update the displays on the right side of the screen
         """""
@@ -294,4 +294,4 @@ class Game:
 
         self.handle_falling()
 
-        self.update_displays()
+        self.render()
