@@ -173,7 +173,7 @@ class Game:
                 self.over = True
         self.grid[self.active_piece.pos[0]:y, self.active_piece.pos[1]:x] = self.active_piece.array
 
-    def is_fixed_block(self, coords: list|tuple) -> bool:
+    def is_fixed_block(self, coords: list | tuple) -> bool:
         return self.config.data["first_fixed_block"] <= self.grid[coords] <= self.config.data["last_fixed_block"]
 
     def reset(self):
