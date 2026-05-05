@@ -148,11 +148,7 @@ class Game:
         self.active_piece = ActivePiece(self, self.config)
         self.insert_blocks()
 
-<<<<<<< HEAD
-        self.next_color = random.choices(list(blocks.keys()))[0]
-=======
         self.next_color = random.choice(list(blocks.keys()))
->>>>>>> dev
         self.line_broken = 0
         self.score = 0
         # var stores the normal speed, when k up isn't pressed
