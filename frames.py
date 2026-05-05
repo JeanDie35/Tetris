@@ -153,20 +153,19 @@ class KeySelector:
         """""
         changes the nkey by n if possible
         """""
-        # we call the get_key method, if the chr() function can't handle the number,
-        # it raises an error which is then caught
-        # if there's no error, the second will be executed
-        try:
-            self.get_key(nkey)
-            self.nkey = nkey
-        except ValueError:
+        # if the isn't valid
+        if self.get_key(nkey) is None:
             print("You can't use that key, please enter another one")
+        else:
+            self.nkey = nkey
 
-    def get_key(self, nkey: int) -> str:
+    def get_key(self, nkey: int) -> str | None:
         """""
         returns the key name corresponding to the nkey
         """""
         if nkey in special_keys:
             return special_keys[nkey]
-        else:
+        elif nkey in range(self.config.data["first_accepted_letter"], self.config.data["last_accepted_letter"] + 1):
             return chr(nkey)
+
+        return None
