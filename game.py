@@ -4,43 +4,43 @@ import pygame
 
 pygame.init()
 
-BlockSize = 25
+BLOCK_SIZE = 25
 
 # dic stores all the arrays for each type of block, with the rotated ones too
 blocks = {
     2: {
         "arrays": [np.array([[0, 1, 0], [1, 1, 0], [0, 1, 0]]), np.array([[0, 0, 0], [1, 1, 1], [0, 1, 0]]),
                    np.array([[0, 1, 0], [0, 1, 1], [0, 1, 0]]), np.array([[0, 1, 0], [1, 1, 1], [0, 0, 0]])],
-        "image": pygame.transform.scale(pygame.image.load("assets/blocks/blue_block.png"), (BlockSize, BlockSize))},
+        "image": pygame.transform.scale(pygame.image.load("assets/blocks/blue_block.png"), (BLOCK_SIZE, BLOCK_SIZE))},
     3: {
         "arrays": [np.array([[1, 0, 0], [1, 1, 0], [0, 1, 0]]), np.array([[0, 0, 0], [0, 1, 1], [1, 1, 0]]),
                    np.array([[0, 1, 0], [0, 1, 1], [0, 0, 1]]), np.array([[0, 1, 1], [1, 1, 0]])],
-        "image": pygame.transform.scale(pygame.image.load("assets/blocks/cyan_block.png"), (BlockSize, BlockSize))
+        "image": pygame.transform.scale(pygame.image.load("assets/blocks/cyan_block.png"), (BLOCK_SIZE, BLOCK_SIZE))
     },
     4: {
         "arrays": [np.array([[0, 1, 0], [0, 1, 0], [1, 1, 0]]), np.array([[0, 0, 0], [1, 1, 1], [0, 0, 1]]),
                    np.array([[0, 1, 1], [0, 1, 0], [0, 1, 0]]), np.array([[1, 0, 0], [1, 1, 1]])],
-        "image": pygame.transform.scale(pygame.image.load("assets/blocks/green_block.png"), (BlockSize, BlockSize))
+        "image": pygame.transform.scale(pygame.image.load("assets/blocks/green_block.png"), (BLOCK_SIZE, BLOCK_SIZE))
     },
     5: {
         "arrays": [np.array([[1, 1, 0], [0, 1, 0], [0, 1, 0]]), np.array([[0, 0, 0], [1, 1, 1], [1, 0, 0]]),
                    np.array([[0, 1, 0], [0, 1, 0], [0, 1, 1]]), np.array([[0, 0, 1], [1, 1, 1]])],
-        "image": pygame.transform.scale(pygame.image.load("assets/blocks/pink_block.png"), (BlockSize, BlockSize))
+        "image": pygame.transform.scale(pygame.image.load("assets/blocks/pink_block.png"), (BLOCK_SIZE, BLOCK_SIZE))
     },
     6: {
         "arrays": [np.array([[0, 1], [0, 1], [0, 1], [0, 1]]), np.array([[0, 0, 0, 0], [0, 0, 0, 0], [1, 1, 1, 1]]),
                    np.array([[0, 0, 1], [0, 0, 1], [0, 0, 1], [0, 0, 1]]), np.array([[0, 0, 0, 0], [1, 1, 1, 1]])],
-        "image": pygame.transform.scale(pygame.image.load("assets/blocks/purple_block.png"), (BlockSize, BlockSize))
+        "image": pygame.transform.scale(pygame.image.load("assets/blocks/purple_block.png"), (BLOCK_SIZE, BLOCK_SIZE))
     },
     7: {
         "arrays": [np.array([[1, 1], [1, 1]]), np.array([[1, 1], [1, 1]]), np.array([[1, 1], [1, 1]]),
                   np.array([[1, 1], [1, 1]])],
-        "image": pygame.transform.scale(pygame.image.load("assets/blocks/red_block.png"), (BlockSize, BlockSize))
+        "image": pygame.transform.scale(pygame.image.load("assets/blocks/red_block.png"), (BLOCK_SIZE, BLOCK_SIZE))
     },
     8: {
         "arrays": [np.array([[0, 1, 0], [1, 1, 0], [1, 0, 0]]), np.array([[0, 0, 0], [1, 1, 0], [0, 1, 1]]),
                   np.array([[0, 0, 1], [0, 1, 1], [0, 1, 0]]), np.array([[1, 1, 0], [0, 1, 1]])],
-        "image": pygame.transform.scale(pygame.image.load("assets/blocks/yellow_block.png"), (BlockSize, BlockSize))
+        "image": pygame.transform.scale(pygame.image.load("assets/blocks/yellow_block.png"), (BLOCK_SIZE, BLOCK_SIZE))
     }
 }
 
@@ -56,12 +56,12 @@ class ActivePiece:
         self.config = config
         self.speed = 1
         self.state = 0
-        self.array = blocks[self.color_value]["arrays"][self.state]
+        self.array = blocks[self.color_value]["arrays"][self.state].copy()
         self.game = game
         # we get the coordinates of each block of the active_piece
         self.coords = self.get_coords(self.game.grid, True)
         # stores the actual positon of the array, so when it turns, it doesn't move right
-        self.pos = [0, self.game.playing_screen_size[0] // 2 // BlockSize]
+        self.pos = [0, self.game.playing_screen_size[0] // 2 // BLOCK_SIZE]
 
     def get_coords(self, array: np.array, reverse: bool) -> list:
         """""
@@ -142,7 +142,7 @@ class Game:
 
         self.playing_screen_size = (self.config.data["playing_screen_width"], self.config.data["playing_screen_height"])
         # creating the numpy array
-        self.arr_size = (self.playing_screen_size[1] // BlockSize, self.playing_screen_size[0] // BlockSize)
+        self.arr_size = (self.playing_screen_size[1] // BLOCK_SIZE, self.playing_screen_size[0] // BLOCK_SIZE)
         self.grid = np.zeros(self.arr_size)
 
         self.active_piece = ActivePiece(self, self.config)
@@ -185,7 +185,7 @@ class Game:
         self.counter = 0
         self.over = False
         # creating the numpy array
-        self.arr_size = (self.playing_screen_size[1] // BlockSize, self.playing_screen_size[0] // BlockSize)
+        self.arr_size = (self.playing_screen_size[1] // BLOCK_SIZE, self.playing_screen_size[0] // BLOCK_SIZE)
         self.grid = np.zeros(self.arr_size)
 
         self.active_piece = ActivePiece(self, self.config)
@@ -269,9 +269,9 @@ class Game:
             for x in range(next_array.shape[1]):
                 if next_array[y, x] == self.config.data["moving_block"]:
                     self.screen.blit(blocks[self.next_color]["image"], (
-                        self.playing_screen_size[0] + self.config.data["sidebar_offset"] + x * BlockSize,
-                        70 + y * BlockSize,
-                        BlockSize, BlockSize))
+                        self.playing_screen_size[0] + self.config.data["sidebar_offset"] + x * BLOCK_SIZE,
+                        70 + y * BLOCK_SIZE,
+                        BLOCK_SIZE, BLOCK_SIZE))
 
     def update_score(self):
         score_text = self.font.render(f"Score : {self.score}", 1, self.config.data["colors"]["white"])
@@ -303,10 +303,10 @@ class Game:
         for y, x in non_zero:
             if self.is_fixed_block((y, x)):
                 self.screen.blit(blocks[int(self.grid[y, x])]["image"],
-                                 (x * BlockSize, y * BlockSize, BlockSize, BlockSize))
+                                 (x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE))
             else:
                 self.screen.blit(blocks[self.active_piece.color_value]["image"],
-                                 (x * BlockSize, y * BlockSize, BlockSize, BlockSize))
+                                 (x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE))
 
     def check_lines(self):
         # checks if grid line of grid is only made of 2s, if so we move all the lines higher than this line down
@@ -321,7 +321,7 @@ class Game:
         """""
         makes the moving blocks fall
         """""
-        if self.counter % int(15 / self.active_piece.speed) == 0:
+        if self.counter % int(self.config.data["fall_tick_rate"] / self.active_piece.speed) == 0:
 
             # getting the coords of the blocks before moving them
             self.active_piece.coords = self.active_piece.get_coords(self.grid, True)

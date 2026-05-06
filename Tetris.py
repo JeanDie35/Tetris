@@ -1,16 +1,17 @@
-from game import *
-from frames import *
-from config import *
+from game import Game
+from frames import Welcome, Settings, GameOver
+from config import Config
 import pygame
 pygame.init()
 pygame.font.init()
 
 config = Config()
 
-Font = pygame.font.SysFont(config.data["font_name"], config.data["font_size"])
+FPS = config.data["FPS"]
+BG_COLOR = config.data["bg_color"]
 
 clock = pygame.time.Clock()
-FPS = config.data["FPS"]
+
 
 """""
 Careful:
@@ -51,7 +52,7 @@ while running:
     if internal_result is not None:
         next_frame = frames[internal_result]
         # hiding the old widgets
-        screen.fill(config.data["bg_color"])
+        screen.fill(BG_COLOR)
 
         if next_frame == game_over and active_frame == game:
             game_over.score = game.score
@@ -76,7 +77,7 @@ while running:
             # it means that we change the frame
             next_frame = frames[external_result]
             # hiding the old widgets
-            screen.fill(config.data["bg_color"])
+            screen.fill(BG_COLOR)
 
             if next_frame == game and active_frame == welcome:
                 # assigning the chosen keys to game
