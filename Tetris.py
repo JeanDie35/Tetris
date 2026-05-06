@@ -34,17 +34,32 @@ settings = Settings(screen, config)
 game_over = GameOver(screen, config)
 
 active_frame = welcome
+next_frame = None
 
+frames = {
+    "game": game,
+    "welcome": welcome,
+    "settings": settings,
+    "game_over": game_over
+}
 
 while running:
-    active_frame.update()
-    pygame.display.flip()
 
-    if active_frame == game and game.over:
-        # hiding the game widgets
+    # handles all the transitions that are triggered by the code
+    internal_result = active_frame.update()
+
+    if internal_result is not None:
+        next_frame = frames[internal_result]
+        # hiding the old widgets
         screen.fill(config.data["bg_color"])
-        active_frame = game_over
-        game_over.score = game.score
+
+        if next_frame == game_over and active_frame == game:
+            game_over.score = game.score
+            game.reset()
+
+        active_frame = next_frame
+
+    pygame.display.flip()
 
     for event in pygame.event.get():
 
@@ -54,112 +69,25 @@ while running:
             pygame.quit()
             running = False
 
-        if event.type == pygame.KEYDOWN:
+        # handles the transitions that are triggered by the user
+        external_result = active_frame.handle_events(event)
 
-            if active_frame == game:
+        if external_result is not None:
+            # it means that we change the frame
+            next_frame = frames[external_result]
+            # hiding the old widgets
+            screen.fill(config.data["bg_color"])
 
-                if event.key == game.key_binds["turn right"] or event.key == game.key_binds["turn left"]:
+            if next_frame == game and active_frame == welcome:
+                # assigning the chosen keys to game
+                for key in game.key_binds.keys():
+                    game.key_binds[key] = settings.get_key_movement(key)
 
-                    # getting the actual coords of the blocks
-                    game.active_piece.coords = game.active_piece.get_coords(game.grid, False)
+            elif active_frame == settings and next_frame == welcome:
+                # saving the chosen keys
+                for movement in game.key_binds:
+                    config.data["key_binds"][movement] = settings.get_key_movement(movement)
 
-                    if event.key == game.key_binds["turn right"]:
-                        turned_array = game.active_piece.simulate_right_turn()
-                        next_state = game.active_piece.get_next_right_state()
-
-                    elif event.key == game.key_binds["turn left"]:
-                        turned_array = game.active_piece.simulate_left_turn()
-                        next_state = game.active_piece.get_next_left_state()
-
-                    # if it can turn
-                    if game.active_piece.can_fit(turned_array):
-                        # hiding old blocks
-                        for y, x in game.active_piece.coords:
-                            game.grid[y, x] = 0
-
-                        # updating the array
-                        game.active_piece.array = turned_array
-                        game.active_piece.state = next_state
-
-                        game.insert_blocks()
-                        # updating coords
-                        game.active_piece.coords = game.active_piece.get_coords(game.grid, False)
-
-                        for y, x in game.active_piece.coords:
-                            game.grid[y, x] = 1
-
-                if event.key == game.key_binds["right"]:
-
-                    # updating the coords before moving
-                    game.active_piece.coords = game.active_piece.get_coords(game.grid, True)
-
-                    # if it can move right, then it moves right
-                    if game.active_piece.can_move(1, 0):
-                        game.active_piece.move(1, 0)
-
-                elif event.key == game.key_binds["left"]:
-
-                    # checks if the shape can move left
-                    game.active_piece.coords = game.active_piece.get_coords(game.grid, False)
-
-                    # if it can move left, then it moves left
-                    if game.active_piece.can_move(-1, 0):
-                        game.active_piece.move(-1, 0)
-
-                if event.key == game.key_binds["speed up"]:
-                    game.active_piece.speed = 3 * game.base_speed
-
-
-            elif active_frame == settings:
-                for k_selector in settings.key_selectors.items():
-                    # if grid key selector is selected, its key will be the pressed one
-                    if k_selector[1].selected:
-                        k_selector[1].change_key(event.key)
-
-        elif event.type == pygame.KEYUP:
-
-            if event.key == game.key_binds["speed up"]:
-                game.active_piece.speed = game.base_speed
-
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-
-            if active_frame == welcome:
-                if welcome.play_rect.collidepoint(event.pos):
-                    # assigning the chosen keys to game
-                    for key in game.key_binds.keys():
-                        game.key_binds[key] = settings.get_key_movement(key)
-                    active_frame = game
-                    # we hide the welcome assets
-                    screen.fill(config.data["bg_color"])
-
-                if welcome.settings_rect.collidepoint(event.pos):
-                    screen.fill(config.data["bg_color"])
-                    active_frame = settings
-
-            elif active_frame == settings:
-
-                if settings.back_rect.collidepoint(event.pos):
-                    active_frame = welcome
-                    # saving the key binds
-                    for nkey in game.key_binds.keys():
-                        config.data["key_binds"][nkey] = settings.get_key_movement(nkey)
-
-                screen.fill(config.data["bg_color"])
-
-                # if the user clicks on grid key selector, it becomes selected
-                for k_selector in settings.key_selectors.items():
-                    if k_selector[1].rect.collidepoint(event.pos):
-                        k_selector[1].selected = True
-                    else:
-                        k_selector[1].selected = False
-
-            elif active_frame == game_over:
-                if game_over.back_rect.collidepoint(event.pos):
-                    game.reset()
-                    active_frame = welcome
-                    screen.fill(config.data["bg_color"])
-
-    if active_frame == game:
-        game.counter += 1
+            active_frame = next_frame
         
     clock.tick(FPS)

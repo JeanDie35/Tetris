@@ -202,6 +202,66 @@ class Game:
             else:
                 self.grid[y - i, :] = self.config.data["empty"]
 
+    def handle_events(self, event):
+
+        if event.type == pygame.KEYDOWN:
+
+            if event.key == self.key_binds["turn right"] or event.key == self.key_binds["turn left"]:
+
+                # getting the actual coords of the blocks
+                self.active_piece.coords = self.active_piece.get_coords(self.grid, False)
+
+                if event.key == self.key_binds["turn right"]:
+                    turned_array = self.active_piece.simulate_right_turn()
+                    next_state = self.active_piece.get_next_right_state()
+
+                elif event.key == self.key_binds["turn left"]:
+                    turned_array = self.active_piece.simulate_left_turn()
+                    next_state = self.active_piece.get_next_left_state()
+
+                # if it can turn
+                if self.active_piece.can_fit(turned_array):
+                    # hiding old blocks
+                    for y, x in self.active_piece.coords:
+                        self.grid[y, x] = 0
+
+                    # updating the array
+                    self.active_piece.array = turned_array
+                    self.active_piece.state = next_state
+
+                    self.insert_blocks()
+                    # updating coords
+                    self.active_piece.coords = self.active_piece.get_coords(self.grid, False)
+
+                    for y, x in self.active_piece.coords:
+                        self.grid[y, x] = 1
+
+            if event.key == self.key_binds["right"]:
+
+                # updating the coords before moving
+                self.active_piece.coords = self.active_piece.get_coords(self.grid, True)
+
+                # if it can move right, then it moves right
+                if self.active_piece.can_move(1, 0):
+                    self.active_piece.move(1, 0)
+
+            elif event.key == self.key_binds["left"]:
+
+                # checks if the shape can move left
+                self.active_piece.coords = self.active_piece.get_coords(self.grid, False)
+
+                # if it can move left, then it moves left
+                if self.active_piece.can_move(-1, 0):
+                    self.active_piece.move(-1, 0)
+
+            if event.key == self.key_binds["speed up"]:
+                self.active_piece.speed = 3 * self.base_speed
+
+        elif event.type == pygame.KEYUP:
+
+            if event.key == self.key_binds["speed up"]:
+                self.active_piece.speed = self.base_speed
+
     def update_next_block(self):
         next_array = blocks[self.next_color]["arrays"][0]
 
@@ -275,6 +335,8 @@ class Game:
                 if not self.over:
                     self.score += self.config.data["score_per_block"]
 
+        self.counter += 1
+
     def spawn_new_blocks(self):
         for co in self.active_piece.coords:
             # creating the put blocks with the blocks color
@@ -295,3 +357,6 @@ class Game:
         self.handle_falling()
 
         self.render()
+
+        if self.over:
+            return "game_over"

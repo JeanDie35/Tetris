@@ -28,7 +28,10 @@ class Frame:
         self.font = pygame.font.SysFont(config.data["font_name"], config.data["font_size"])
 
     def update(self):
-        pass
+        return None
+
+    def handle_events(self, event):
+        return None
 
 
 
@@ -52,6 +55,17 @@ class Welcome(Frame):
         self.screen.blit(assets["play"], self.play_rect)
 
         self.screen.blit(assets["settings"], self.settings_rect)
+
+    def handle_events(self, event: pygame.event.Event) -> str | None:
+        if event.type == pygame.MOUSEBUTTONDOWN:
+
+            if self.play_rect.collidepoint(event.pos):
+                return "game"
+
+            elif self.settings_rect.collidepoint(event.pos):
+                return "settings"
+
+        return None
 
 
 # the frame where you can change the key binds
@@ -91,6 +105,28 @@ class Settings(Frame):
         """""
         return self.key_selectors[movement].nkey
 
+    def handle_events(self, event: pygame.event.Event) -> str | None:
+        if event.type == pygame.KEYDOWN:
+            for k_selector in self.key_selectors.items():
+                # if grid key selector is selected, its key will be the pressed one
+                if k_selector[1].selected:
+                    k_selector[1].change_key(event.key)
+
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+
+            # if the user clicks on grid key selector, it becomes selected
+            for k_selector in self.key_selectors.items():
+                if k_selector[1].rect.collidepoint(event.pos):
+                    k_selector[1].selected = True
+                else:
+                    k_selector[1].selected = False
+
+            if self.back_rect.collidepoint(event.pos):
+                return "welcome"
+
+        return None
+
+
 
 # frame when the game is over
 class GameOver(Frame):
@@ -123,6 +159,12 @@ class GameOver(Frame):
                          (self.screen.get_width() // 2 - assets["victory"].get_width() // 2,
                           self.screen.get_height() // 4 - assets["victory"].get_height() // 4))
 
+    def handle_events(self, event: pygame.event.Event) -> str | None:
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if self.back_rect.collidepoint(event.pos):
+                return "welcome"
+
+        return None
 
 
 class KeySelector:
